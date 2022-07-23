@@ -1,8 +1,11 @@
 ﻿using Model;
 using Repository;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -14,7 +17,7 @@ namespace Notes
     {
         private IMemoRepository _repository;
         private Memo? _currentItem;
-        private string _filterText;
+        private string _filterText = string.Empty;
 
         public MainWindow(IMemoRepository repository)
         {
@@ -123,17 +126,98 @@ namespace Notes
                     return false;
 
                 if (string.IsNullOrEmpty(FilterText)
-                    || memo.Header.Contains(FilterText, StringComparison.OrdinalIgnoreCase)
+                    || DeepContains(memo.Header, FilterText)
                     || memo.Body.Contains(FilterText, StringComparison.OrdinalIgnoreCase))
                     return true;
 
                 return false;
             };
 
+            collectionView.SortDescriptions.Clear();
             collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.InsertedDate), ListSortDirection.Descending));
+
+            MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
         }
 
         private void ClearFilter(object sender, RoutedEventArgs e)
             => FilterText = string.Empty;
+
+        private bool DeepContains(string content, string search)
+        {
+            if (content.Contains(search, StringComparison.OrdinalIgnoreCase)
+                || Translate(content.ToLower()).Contains(search, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        }
+
+        private readonly BijectiveDictionary<char> _dictionary = new()
+        {
+            { 'q', 'й' },
+            { 'w', 'ц' },
+            { 'e', 'у' },
+            { 'r', 'к' },
+            { 't', 'е' },
+            { 'y', 'н' },
+            { 'u', 'г' },
+            { 'i', 'ш' },
+            { 'o', 'щ' },
+            { 'p', 'з' },
+            { '[', 'х' },
+            { ']', 'ъ' },
+            { 'a', 'ф' },
+            { 's', 'ы' },
+            { 'd', 'в' },
+            { 'f', 'а' },
+            { 'g', 'п' },
+            { 'h', 'р' },
+            { 'j', 'о' },
+            { 'k', 'л' },
+            { 'l', 'д' },
+            { ';', 'ж' },
+            { '\'', 'э' },
+            { 'z', 'я' },
+            { 'x', 'ч' },
+            { 'c', 'с' },
+            { 'v', 'м' },
+            { 'b', 'и' },
+            { 'n', 'т' },
+            { 'm', 'ь' },
+            { ',', 'б' },
+            { '.', 'ю' }
+        };
+        private string Translate(string input)
+        {
+            var result = new StringBuilder();
+
+            foreach (char symbol in input)
+            {
+                char newSymbol = symbol;
+                try
+                {
+                    newSymbol = _dictionary[symbol];
+                }
+                catch { }
+                result.Append(newSymbol);
+            }
+
+            return result.ToString();
+        }
+    }
+
+    class BijectiveDictionary<T> : Dictionary<T, T>
+        where T : notnull
+    {
+        public new T this[T index]
+        {
+            get
+            {
+                if (ContainsKey(index))
+                    return base[index];
+                if (ContainsValue(index))
+                    return this.FirstOrDefault(x => index.Equals(x.Value)).Key;
+                throw new KeyNotFoundException("index");
+            }
+        }
     }
 }

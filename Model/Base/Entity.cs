@@ -30,6 +30,11 @@ namespace Model.Base
 
             if(TrackChanges && _oldProperties?.ContainsKey(propertyName) != true)
                 (_oldProperties ??= new Dictionary<string, object?>()).Add(propertyName, property);
+            else if(TrackChanges && Equals(_oldProperties?[propertyName], value))
+            {
+                _oldProperties?.Remove(propertyName);
+                _oldProperties = null;
+            }
 
             property = value;
 
