@@ -25,12 +25,12 @@
 
             <DockPanel DockPanel.Dock="Top" Margin="5 0 5 5">
                 <Button Click="ClearFilter" DockPanel.Dock="Right" Content="X" Width="20"/>
-                <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" TabIndex="1"/>
             </DockPanel>
 
             <!--<Button DockPanel.Dock="Bottom" Content="Settings" Margin="5 0 5 5"/>-->
 
-            <ListView x:Name="MemoList" Margin="5 0 5 5" ItemsSource="{Binding Items, Mode=OneWay}"
+            <ListView x:Name="MemoList" Margin="5 0 5 5" TabIndex="2" ItemsSource="{Binding Items, Mode=OneWay}"
                       SelectedItem="{Binding CurrentItem, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -52,9 +52,9 @@
             <Grid DockPanel.Dock="Bottom" Margin="5 0 5 5">
                 <TextBlock HorizontalAlignment="Left"
                            Visibility="{Binding CurrentItem.UpdatedDate, Converter={x:Static converters:NullToVisibilityConverter.Instance}}"
-                           Text="{Binding CurrentItem.UpdatedDate, StringFormat=LastUpdate: {0:dd/mm} {0:HH:mm}, Mode=OneWay}"/>
+                           Text="{Binding CurrentItem.UpdatedDate, StringFormat=LastUpdate: {0:dd/MM} {0:HH:mm}, Mode=OneWay}"/>
                 <TextBlock HorizontalAlignment="Right"
-                           Text="{Binding CurrentItem.InsertedDate, StringFormat=Created: {0:dd/mm} {0:HH:mm}, Mode=OneWay}"/>
+                           Text="{Binding CurrentItem.InsertedDate, StringFormat=Created: {0:dd/MM} {0:HH:mm}, Mode=OneWay}"/>
             </Grid>
             <TextBox DockPanel.Dock="Top" Margin="5 0 5 5" AcceptsReturn="True"
                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
