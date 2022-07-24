@@ -103,7 +103,17 @@ namespace Notes
             if(CurrentItem.Id == 0)
                 CurrentItem = null;
             else
-                _ = await _repository.Remove(CurrentItem);
+            {
+                if (MessageBox.Show(
+                    this,
+                    $"Delete {CurrentItem.Header}? вфш",
+                    "Warning",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning
+                    ) == MessageBoxResult.Yes)
+                    _ = await _repository.Remove(CurrentItem);
+                else return;
+            }
 
             await Load();
         }
@@ -145,7 +155,7 @@ namespace Notes
         private bool DeepContains(string content, string search)
         {
             if (content.Contains(search, StringComparison.OrdinalIgnoreCase)
-                || Translate(content.ToLower()).Contains(search, StringComparison.OrdinalIgnoreCase))
+                || content.Contains(Translate(search), StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;
@@ -190,7 +200,7 @@ namespace Notes
         {
             var result = new StringBuilder();
 
-            foreach (char symbol in input)
+            foreach (char symbol in input.ToLower())
             {
                 char newSymbol = symbol;
                 try

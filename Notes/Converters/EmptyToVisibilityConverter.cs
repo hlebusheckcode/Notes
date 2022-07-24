@@ -7,7 +7,7 @@ namespace Notes.Converters
 {
     internal class EmptyToVisibilityConverter : IValueConverter
     {
-        public static NullToVisibilityConverter Instance { get; } = new();
+        public static EmptyToVisibilityConverter Instance { get; } = new();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
