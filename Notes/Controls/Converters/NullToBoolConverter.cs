@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Notes.Converters
+namespace Notes.Controls.Converters
 {
     internal class NullToBoolConverter : IValueConverter
     {

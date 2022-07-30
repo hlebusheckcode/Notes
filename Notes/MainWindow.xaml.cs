@@ -1,4 +1,5 @@
 ﻿using Model;
+using Notes.Controls.Commands;
 using Repository;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace Notes
         public MainWindow(IMemoRepository repository)
         {
             InitializeComponent();
+            SaveCommand = new RelayCommand(async (_) => await SaveCurrentItem(), (_) => CurrentItem != null);
             DataContext = this;
             _repository = repository;
             Load();
@@ -48,6 +50,8 @@ namespace Notes
                 collectionView.Refresh();
             }
         }
+
+        public ICommand SaveCommand { get; set; }
 
         private async Task Load()
         {
@@ -106,10 +110,11 @@ namespace Notes
             {
                 if (MessageBox.Show(
                     this,
-                    $"Delete {CurrentItem.Header}? вфш",
+                    $"Delete {CurrentItem.Header}?",
                     "Warning",
                     MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.No
                     ) == MessageBoxResult.Yes)
                     _ = await _repository.Remove(CurrentItem);
                 else return;

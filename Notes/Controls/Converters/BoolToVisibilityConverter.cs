@@ -3,23 +3,23 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Notes.Converters
+namespace Notes.Controls.Converters
 {
-    internal class EmptyToVisibilityConverter : IValueConverter
+    internal class BoolToVisibilityConverter : IValueConverter
     {
-        public static EmptyToVisibilityConverter Instance { get; } = new();
+        public static BoolToVisibilityConverter Instance { get; } = new();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var result = Visibility.Collapsed;
-
-            if (!string.IsNullOrEmpty(value.ToString()))
-                result = Visibility.Visible;
+            bool visible = (value as bool?) == true;
 
             if (parameter != null && parameter.ToString() == "invert")
-                result = result == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
+                visible = !visible;
 
-            return result;
+            if(visible)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

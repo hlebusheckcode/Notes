@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Notes.Converters
+namespace Notes.Controls.Converters
 {
     internal class NullToVisibilityConverter : IValueConverter
     {

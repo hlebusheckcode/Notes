@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Data;
 
-namespace Notes.Converters
+namespace Notes.Controls.Converters
 {
     public class SingleLineTextConverter : IValueConverter
     {
