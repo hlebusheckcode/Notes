@@ -14,24 +14,14 @@ namespace Notes
 
         public App()
         {
-            var folder = Environment.SpecialFolder.LocalApplicationData;
-            var path = Environment.GetFolderPath(folder);
-#if DEBUG
-            var dbName = "notes.test.db";
-#else
-            var dbName = "notes.db";
-#endif
-            DbPath = Path.Join(path, dbName);
             ServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
             serviceProvider = services.BuildServiceProvider();
         }
 
-        public string DbPath { get; set; }
-
         private void ConfigureServices(ServiceCollection services)
         {
-            services.AddDbContext<DataContext>(options => options.UseSqlite($"Data Source={DbPath}"));
+            services.AddDbContext<DataContext>();
             services.AddScoped<IMemoRepository, MemoRepository>();
             services.AddSingleton<MainWindow>();
         }

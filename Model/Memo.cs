@@ -6,6 +6,7 @@ namespace Model
     {
         private string _header = string.Empty;
         private string _body = string.Empty;
+        private bool _textWrapping = false;
 
         public string Header
         {
@@ -16,6 +17,11 @@ namespace Model
         {
             get => _body;
             set => SetValue(ref _body, value, nameof(Body));
+        }
+        public bool TextWrapping
+        {
+            get => _textWrapping;
+            set => SetValue(ref _textWrapping, value, nameof(TextWrapping));
         }
     }
 }

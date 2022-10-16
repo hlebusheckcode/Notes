@@ -378,6 +378,48 @@
         </Setter>
     </Style>
 
-    
+    <Style x:Key="TextCheckBox" TargetType="{x:Type CheckBox}">
+        <Setter Property="FontSize" Value="{DynamicResource MediumFontSize}"/>
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFont}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimarySolidBrush}"/>
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <Border TextBlock.Foreground="{StaticResource ForegroundPrimarySolidBrush}"
+                            x:Name="Border"
+                            CornerRadius="{StaticResource MediumRadius}"
+                            BorderThickness="1"
+                            Background="{StaticResource PrimarySolidBrush}"
+                            BorderBrush="{StaticResource SecondarySolidBrush}">
+                        <ContentPresenter Margin="5 2"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="Border" Property="Border.BorderBrush" Value="{StaticResource SecondarySolidBrush}"/>
+                            <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource SecondarySolidBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter TargetName="Border" Property="Border.BorderBrush" Value="{StaticResource AccentSolidBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter TargetName="Border" Property="Border.BorderBrush" Value="{StaticResource AccentSolidBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Border" Property="Border.BorderBrush" Value="{StaticResource SecondarySolidBrush}"/>
+                            <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource SecondarySolidBrush}"/>
+                            <Setter TargetName="Border" Property="TextBlock.Foreground" Value="{StaticResource AccentSolidBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
 </ResourceDictionary>

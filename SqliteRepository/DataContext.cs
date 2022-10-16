@@ -6,11 +6,17 @@ namespace SqliteRepository
 {
     public class DataContext : DbContext
     {
+        public DataContext()
+        {
+            ConfigureDbPath();
+        }
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
+            ConfigureDbPath();
         }
+
+        public string DbPath { get; set; }
 
         public DbSet<Memo> Memos => Set<Memo>();
 
@@ -43,6 +49,24 @@ namespace SqliteRepository
             }
 
             return base.SaveChangesAsync(cancellationToken);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseSqlite($"Data Source={DbPath}");
+        }
+
+        private void ConfigureDbPath()
+        {
+            var folder = Environment.SpecialFolder.LocalApplicationData;
+            var path = Environment.GetFolderPath(folder);
+#if DEBUG
+            var dbName = "notes.test.db";
+#else
+            var dbName = "notes.db";
+#endif
+            DbPath = Path.Join(path, dbName);
         }
     }
 }
