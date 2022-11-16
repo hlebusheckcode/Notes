@@ -74,10 +74,13 @@
     <CornerRadius x:Key="MediumRadius">5</CornerRadius>
     <CornerRadius x:Key="SmallRadius">3</CornerRadius>
 
+    <system:Double x:Key="DefaultHeight">23</system:Double>
+
     <Style x:Key="DefaultButton" TargetType="{x:Type Button}">
-        <Setter Property="FontSize" Value="{DynamicResource MediumFontSize}"/>
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFont}"/>
-        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimarySolidBrush}"/>
+        <Setter Property="Height" Value="{StaticResource DefaultHeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource MediumFontSize}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}"/>
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
@@ -120,11 +123,15 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style x:Key="IconButton" TargetType="{x:Type Button}" BasedOn="{StaticResource DefaultButton}">
+        <Setter Property="Width" Value="{StaticResource DefaultHeight}"/>
+        <Setter Property="FontFamily" Value="{StaticResource Icons}"/>
+    </Style>
 
     <Style x:Key="DefaultTextBlock" TargetType="{x:Type TextBlock}">
-        <Setter Property="FontSize" Value="{DynamicResource MediumFontSize}"/>
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFont}"/>
-        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimarySolidBrush}"/>
+        <Setter Property="FontSize" Value="{StaticResource MediumFontSize}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}"/>
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
@@ -133,6 +140,7 @@
     </Style>
 
     <Style x:Key="ClearTextButton" TargetType="{x:Type Button}" BasedOn="{StaticResource DefaultButton}">
+        <Setter Property="Height" Value="Auto"/>
         <Setter Property="FontSize" Value="{StaticResource SmallFontSize}"/>
         <Setter Property="Background" Value="{StaticResource PrimarySolidBrush}"/>
         <Setter Property="MinHeight" Value="0"/>
@@ -173,9 +181,10 @@
     </Style>
 
     <Style x:Key="BaseTextBox" TargetType="{x:Type TextBoxBase}">
-        <Setter Property="FontSize" Value="{DynamicResource MediumFontSize}"/>
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFont}"/>
-        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimarySolidBrush}"/>
+        <Setter Property="Height" Value="{StaticResource DefaultHeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource MediumFontSize}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}"/>
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
@@ -234,6 +243,7 @@
     </Style>
 
     <Style x:Key="SearchTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource BaseTextBox}">
+        <Setter Property="Height" Value="Auto"/>
         <Setter Property="IsInactiveSelectionHighlightEnabled" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -380,9 +390,10 @@
     </Style>
 
     <Style x:Key="TextCheckBox" TargetType="{x:Type CheckBox}">
-        <Setter Property="FontSize" Value="{DynamicResource MediumFontSize}"/>
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFont}"/>
-        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimarySolidBrush}"/>
+        <Setter Property="Height" Value="{StaticResource DefaultHeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource MediumFontSize}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}"/>
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
