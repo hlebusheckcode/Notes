@@ -7,21 +7,18 @@ namespace Baza.Models
     public abstract class Entity : IEntity
     {
         private Dictionary<string, object?>? _oldProperties;
-        private int _id;
-
-        [Key, JsonIgnore]
-        public int Id
-        {
-            get => _id;
-            set => SetValue(ref _id, value, nameof(Id));
-        }
 
         [NotMapped, JsonIgnore]
-        public bool IsNew => Id == default;
+        public bool IsNew => GetIdentifier() == null;
         [NotMapped, JsonIgnore]
         public bool TrackChanges { get; set; } = true;
         [NotMapped, JsonIgnore]
         public bool HasChanges => _oldProperties?.Any() == true;
+
+        public virtual object? GetIdentifier()
+            => throw new NotImplementedException();
+        public virtual void SetIdentifier(object identifier)
+            => throw new NotImplementedException();
 
         public void ApplyChanges()
             => _oldProperties = null;

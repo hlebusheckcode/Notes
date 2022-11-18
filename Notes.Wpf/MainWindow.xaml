@@ -33,21 +33,19 @@
         <DockPanel Grid.Column="0">
             <UniformGrid Rows="1" DockPanel.Dock="Top" Margin="0 5">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button FontFamily="{StaticResource Icons}" Content="&#x25;" Margin="5 0 5 0"
-                            ToolTip="Settings"/>
-                    <Button Click="ImportClick" FontFamily="{StaticResource Icons}" Content="&#x20;" Margin="0 0 5 0"
+                    <Button Click="ImportClick" Style="{StaticResource IconButton}" Content="&#x20;" Margin="5 0 5 0"
                             ToolTip="Import"/>
-                    <Button Click="ExportClick" FontFamily="{StaticResource Icons}" Content="&#x21;" Margin="0 0 5 0"
+                    <Button Click="ExportClick" Style="{StaticResource IconButton}" Content="&#x21;" Margin="0 0 5 0"
                             ToolTip="Export"/>
                 </StackPanel>
                 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Click="AddClick" FontFamily="{StaticResource Icons}" Content="&#x26;" Margin="5 0 5 0"
+                    <Button Click="AddClick" Style="{StaticResource IconButton}" Content="&#x26;" Margin="5 0 5 0"
                             ToolTip="Create new"/>
-                    <Button Click="DeleteClick" FontFamily="{StaticResource Icons}" Content="&#x28;" Margin="0 0 5 0"
+                    <Button Click="DeleteClick" Style="{StaticResource IconButton}" Content="&#x28;" Margin="0 0 5 0"
                             IsEnabled="{Binding CurrentItem, Converter={x:Static converters:NullToBoolConverter.Instance}}"
                             ToolTip="Delete selected"/>
-                    <Button Click="RefreshClick" FontFamily="{StaticResource Icons}" Content="&#x27;" Margin="0 0 5 0"
+                    <Button Click="RefreshClick" Style="{StaticResource IconButton}" Content="&#x27;" Margin="0 0 5 0"
                             ToolTip="Refresh data"/>
                 </StackPanel>
             </UniformGrid>

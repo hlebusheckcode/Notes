@@ -149,6 +149,7 @@ namespace Notes
                     return;
                 await _repository.Import(newItems);
                 Refresh();
+                MessageBox.Show(this, "Import completed.", "Informing", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
@@ -165,6 +166,7 @@ namespace Notes
             {
                 var content = JsonSerializer.Serialize(Items.ToArray());
                 await File.WriteAllTextAsync(saveFileDialog.FileName, content);
+                MessageBox.Show(this, "Export completed.", "Informing", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
