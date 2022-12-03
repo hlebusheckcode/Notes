@@ -1,0 +1,42 @@
+﻿<Window x:Class="Notes.ConfigurationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:helpers="clr-namespace:Notes.Controls.Helpers"
+        mc:Ignorable="d"
+        Title="Configuration"
+        Height="126" Width="300"
+        WindowStartupLocation="CenterOwner"
+        Style="{StaticResource WindowStyle}">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource TransparentButton}"/>
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DefaultTextBlock}"/>
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBox}"/>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!--<ColumnDefinition Width="*"/>-->
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5"
+                   Text="Данные"/>
+        <!--<TextBox Grid.Row="1" Grid.Column="0" Margin="5 0 5 5"
+                 helpers:TextBoxHelper.Watermark="Import path"
+                 helpers:TextBoxHelper.ClearTextButton="True"/>-->
+        <Button Grid.Row="1" Grid.Column="1" Margin="5 0 5 5" Padding="5 0"
+                Content="Import" Click="ImportClick"/>
+        <!--<TextBox Grid.Row="2" Grid.Column="0" Margin="5 0 5 5"
+                 helpers:TextBoxHelper.Watermark="Export path"
+                 helpers:TextBoxHelper.ClearTextButton="True"/>-->
+        <Button Grid.Row="2" Grid.Column="1" Margin="5 0 5 5" Padding="5 0"
+                Content="Export" Click="ExportClick"/>
+    </Grid>
+</Window>

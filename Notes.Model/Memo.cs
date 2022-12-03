@@ -1,4 +1,4 @@
-﻿using Baza.Models;
+﻿using Baza.Model;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -10,7 +10,7 @@ namespace Notes.Model
         private int _id;
         private string _header = string.Empty;
         private string _body = string.Empty;
-        private bool _textWrapping = false;
+        private bool _favorite = false;
         private DateTime _insertedDate;
         private DateTime? _updatedDate;
         private DateTime? _removedDate;
@@ -32,11 +32,13 @@ namespace Notes.Model
             get => _body;
             set => SetValue(ref _body, value, nameof(Body));
         }
-        public bool TextWrapping
+        public bool Favorite
         {
-            get => _textWrapping;
-            set => SetValue(ref _textWrapping, value, nameof(TextWrapping));
+            get => _favorite;
+            set => SetValue(ref _favorite, value, nameof(Favorite));
         }
+
+        public TextProperties BodyProperties { get; set; } = new();
 
         [Required]
         public DateTime InsertedDate
@@ -56,9 +58,11 @@ namespace Notes.Model
         }
 
         [NotMapped, JsonIgnore]
-        public bool IsRemoved => RemovedDate.HasValue;
+        public bool Removed => RemovedDate.HasValue && RemovedDate < DateTime.Now;
 
         public override object? GetIdentifier() => Id;
         public override void SetIdentifier(object identifier) => Id = Convert.ToInt32(identifier);
+
+        public override string ToString() => Header;
     }
 }

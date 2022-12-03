@@ -18,7 +18,11 @@ namespace Notes
 
         private void ConfigureServices(ServiceCollection services)
         {
-            services.AddDbContext<DataContext>();
+            //try
+            //{
+                services.AddDbContext<DataContext>();
+            //}
+            //catch { }
             services.AddScoped<IMemoRepository, MemoRepository>();
             services.AddSingleton<MainWindow>();
         }

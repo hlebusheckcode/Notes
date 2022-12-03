@@ -8,18 +8,19 @@ using Notes.SqliteRepository;
 
 #nullable disable
 
-namespace SqliteRepository.Migrations
+namespace Notes.SqliteRepository.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221015194633_TextWrapping")]
-    partial class TextWrapping
+    [Migration("20221127144058_Initial")]
+    partial class Initial
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
 
-            modelBuilder.Entity("Model.Memo", b =>
+            modelBuilder.Entity("Notes.Model.Memo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -28,6 +29,9 @@ namespace SqliteRepository.Migrations
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Favorite")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Header")
                         .IsRequired()
@@ -39,15 +43,37 @@ namespace SqliteRepository.Migrations
                     b.Property<DateTime?>("RemovedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("TextWrapping")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("Memos");
+                });
+
+            modelBuilder.Entity("Notes.Model.Memo", b =>
+                {
+                    b.OwnsOne("Notes.Model.TextProperties", "BodyProperties", b1 =>
+                        {
+                            b1.Property<int>("MemoId")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<bool>("ReadOnly")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<bool>("Wrapping")
+                                .HasColumnType("INTEGER");
+
+                            b1.HasKey("MemoId");
+
+                            b1.ToTable("Memos");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MemoId");
+                        });
+
+                    b.Navigation("BodyProperties")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

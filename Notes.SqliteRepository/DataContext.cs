@@ -7,25 +7,29 @@ namespace Notes.SqliteRepository
     {
         public DataContext()
         {
-            ConfigureDbPath();
+            ConfigureDefaultDbPath();
         }
-        public DataContext(DbContextOptions<DataContext> options)
+        public DataContext(DbContextOptions<DataContext> options) : this(options, null) { }
+        public DataContext(DbContextOptions<DataContext> options, string? path)
             : base(options)
         {
-            ConfigureDbPath();
+            if (string.IsNullOrWhiteSpace(path))
+                ConfigureDefaultDbPath();
+
+            Database.Migrate();
         }
 
-        public string DbPath { get; set; }
+        public string DbPath { get; set; } = string.Empty;
 
         public bool AutoSetInsertedDate { get; set; } = true;
 
         public bool AutoSetUpdatedDate { get; set; } = true;
 
-        public DbSet<Memo> Memos { get; set; }
+        public DbSet<Memo> Memos => Set<Memo>();
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            if(AutoSetInsertedDate)
+            if (AutoSetInsertedDate)
             {
                 var insertedEntries = ChangeTracker.Entries()
                                    .Where(x => x.State == EntityState.Added)
@@ -39,7 +43,7 @@ namespace Notes.SqliteRepository
                 }
             }
 
-            if(AutoSetUpdatedDate)
+            if (AutoSetUpdatedDate)
             {
                 var modifiedEntries = ChangeTracker.Entries()
                        .Where(x => x.State == EntityState.Modified)
@@ -58,10 +62,7 @@ namespace Notes.SqliteRepository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Memo>().OwnsOne(memo => memo.BodySettings, navigationsBuilder =>
-            //{
-            //    navigationsBuilder.ToJson();
-            //});
+            modelBuilder.Entity<Memo>().OwnsOne(memo => memo.BodyProperties);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -69,10 +70,10 @@ namespace Notes.SqliteRepository
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlite($"Data Source={DbPath}");
+            optionsBuilder.UseSqlite(@$"Data Source={DbPath}");
         }
 
-        private void ConfigureDbPath()
+        private void ConfigureDefaultDbPath()
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);

@@ -14,6 +14,8 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using System.IO;
 using System.Text.Json;
+using Notes.Wpf.Controls;
+using System.Windows.Media;
 
 namespace Notes
 {
@@ -22,6 +24,7 @@ namespace Notes
         private IMemoRepository _repository;
         private Memo? _currentItem;
         private string _filterText = string.Empty;
+        private RemoveOption _removeOption = RemoveOption.WithoutRemoved;
 
         public MainWindow(IMemoRepository repository)
         {
@@ -42,6 +45,7 @@ namespace Notes
                 OnPropertyChanged(nameof(CurrentItem));
             }
         }
+
         public string FilterText
         {
             get => _filterText;
@@ -55,16 +59,30 @@ namespace Notes
         }
 
         public ICommand SaveCommand { get; set; }
+        public RemoveOption RemoveOption 
+        {
+            get => _removeOption;
+            set
+            {
+                _removeOption = value;
+                Load();
+            }
+        }
 
         private async Task Load()
         {
             Items.Clear();
-            foreach (var item in await _repository.Get())
+            var items = await _repository.Get(RemoveOption);
+            foreach (var item in items)
                 Items.Add(item);
         }
 
         private void AddClick(object sender, RoutedEventArgs e)
             => Add();
+        private void RemoveClick(object sender, RoutedEventArgs e)
+            => RemoveCurrentItem();
+        private void RecoverClick(object sender, RoutedEventArgs e)
+            => RecoverCurrentItem();
         private void DeleteClick(object sender, RoutedEventArgs e)
             => DeleteCurrentItem();
         private void RefreshClick(object sender, RoutedEventArgs e)
@@ -75,10 +93,16 @@ namespace Notes
         private void ExportClick(object sender, RoutedEventArgs e)
             => Export();
 
+        private void CloseFilterClick(object sender, RoutedEventArgs e)
+            => ShowFilter.IsChecked = false;
+
+        private void OpenConfigurationClick(object sender, RoutedEventArgs e)
+            => new ConfigurationWindow(_repository) { Owner = this }.Show();
+
         private void SaveItemEvent(object sender, KeyboardFocusChangedEventArgs e)
             => SaveCurrentItem();
 
-        private async void Refresh()
+        public async void Refresh()
         {
             CurrentItem = null;
             await Load();
@@ -93,13 +117,13 @@ namespace Notes
         {
             if (CurrentItem == null) return;
 
-            if (CurrentItem.Id == 0 && (!string.IsNullOrEmpty(CurrentItem.Header) || !string.IsNullOrEmpty(CurrentItem.Body)))
+            if (CurrentItem.New && (!string.IsNullOrEmpty(CurrentItem.Header) || !string.IsNullOrEmpty(CurrentItem.Body)))
             {
                 _ = await _repository.Insert(CurrentItem);
                 CurrentItem.ApplyChanges();
                 Items.Add(CurrentItem);
             }
-            else if (CurrentItem.HasChanges)
+            else if (CurrentItem.HasChanges || CurrentItem.BodyProperties.HasChanges)
             {
                 _ = await _repository.Update(CurrentItem);
                 CurrentItem.ApplyChanges();
@@ -108,7 +132,7 @@ namespace Notes
             OnPropertyChanged(nameof(CurrentItem));
         }
 
-        private async Task DeleteCurrentItem()
+        private async Task RemoveCurrentItem()
         {
             if (CurrentItem == null) return;
 
@@ -116,15 +140,50 @@ namespace Notes
                 CurrentItem = null;
             else
             {
-                if (MessageBox.Show(
+                if (CustomMessageBox.Show(
+                    this,
+                    $"Remove {CurrentItem.Header}?",
+                    "Warning",
+                    "\u0028",
+                    (SolidColorBrush)Application.Current.FindResource("WarningSolidBrush"),
+                    MessageBoxButton.YesNo
+                    ) == MessageBoxResult.Yes)
+                    _ = await _repository.Remove(CurrentItem);
+                else return;
+            }
+
+            await Load();
+        }
+
+        private async Task RecoverCurrentItem()
+        {
+            if (CurrentItem == null) return;
+
+            if (CurrentItem.Id == 0)
+                CurrentItem = null;
+            else
+                await _repository.Recover(CurrentItem);
+
+            await Load();
+        }
+
+        private async Task DeleteCurrentItem()
+        {
+            if (CurrentItem == null) return;
+
+            if (CurrentItem.Id == 0)
+                CurrentItem = null;
+            else
+            {
+                if (CustomMessageBox.Show(
                     this,
                     $"Delete {CurrentItem.Header}?",
                     "Warning",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning,
-                    MessageBoxResult.No
+                    "\u0045",
+                    (SolidColorBrush)Application.Current.FindResource("ErrorSolidBrush"),
+                    MessageBoxButton.YesNo
                     ) == MessageBoxResult.Yes)
-                    _ = await _repository.Remove(CurrentItem);
+                    _ = await _repository.Delete(CurrentItem);
                 else return;
             }
 
@@ -149,7 +208,13 @@ namespace Notes
                     return;
                 await _repository.Import(newItems);
                 Refresh();
-                MessageBox.Show(this, "Import completed.", "Informing", MessageBoxButton.OK, MessageBoxImage.Information);
+                CustomMessageBox.Show(
+                    this,
+                    $"Import completed.",
+                    "Informing",
+                    "\u0027",
+                    (SolidColorBrush)Application.Current.FindResource("InformationSolidBrush"),
+                    MessageBoxButton.OK);
             }
         }
 
@@ -166,7 +231,13 @@ namespace Notes
             {
                 var content = JsonSerializer.Serialize(Items.ToArray());
                 await File.WriteAllTextAsync(saveFileDialog.FileName, content);
-                MessageBox.Show(this, "Export completed.", "Informing", MessageBoxButton.OK, MessageBoxImage.Information);
+                CustomMessageBox.Show(
+                    this,
+                    $"Export completed.",
+                    "Informing",
+                    "\u0030",
+                    (SolidColorBrush)Application.Current.FindResource("InformationSolidBrush"),
+                    MessageBoxButton.OK);
             }
         }
 
@@ -196,6 +267,7 @@ namespace Notes
             };
 
             collectionView.SortDescriptions.Clear();
+            collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.Favorite), ListSortDirection.Descending));
             collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.InsertedDate), ListSortDirection.Descending));
 
             MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
