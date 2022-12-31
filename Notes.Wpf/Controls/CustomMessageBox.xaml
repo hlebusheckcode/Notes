@@ -6,7 +6,8 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         Title="CustomMessageBox" Height="150" Width="300"
-        Style="{StaticResource WindowStyle}">
+        Style="{StaticResource WindowStyle}"
+        Loaded="LoadedWindow">
     <Window.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}"/>
         <Style TargetType="TextBlock" BasedOn="{StaticResource DefaultTextBlock}"/>

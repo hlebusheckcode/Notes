@@ -23,6 +23,8 @@ namespace Notes.Wpf
 
     public partial class WindowStyle
     {
+        
+
         void IconMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount > 1)

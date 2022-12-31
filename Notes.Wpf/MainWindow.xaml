@@ -24,7 +24,7 @@
                         Content="&#x24;"
                         HorizontalAlignment="Left"
                         WindowChrome.IsHitTestVisibleInChrome="True"
-                        Margin="0 0 0 5"
+                        Margin="5 0 0 5"
                         Width="30"
                         Click="OpenConfigurationClick"/>
             </behaviors:WindowBarBehavior.TopBar>

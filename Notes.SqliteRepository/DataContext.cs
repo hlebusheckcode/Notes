@@ -13,8 +13,9 @@ namespace Notes.SqliteRepository
         public DataContext(DbContextOptions<DataContext> options, string? path)
             : base(options)
         {
-            if (string.IsNullOrWhiteSpace(path))
-                ConfigureDefaultDbPath();
+            DbPath = string.IsNullOrWhiteSpace(path)
+                ? ConfigureDefaultDbPath()
+                : path;
 
             Database.Migrate();
         }
@@ -73,7 +74,7 @@ namespace Notes.SqliteRepository
             optionsBuilder.UseSqlite(@$"Data Source={DbPath}");
         }
 
-        private void ConfigureDefaultDbPath()
+        private string ConfigureDefaultDbPath()
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
@@ -82,7 +83,7 @@ namespace Notes.SqliteRepository
 #else
             var dbName = "notes.db";
 #endif
-            DbPath = Path.Join(path, dbName);
+            return Path.Join(path, dbName);
         }
     }
 }

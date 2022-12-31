@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Notes.Wpf.Controls
@@ -70,6 +71,15 @@ namespace Notes.Wpf.Controls
                 _result = MessageBoxResult.None;
 
             Close();
+        }
+
+        private void LoadedWindow(object sender, RoutedEventArgs e)
+        {
+            var minButton = (Button)Template.FindName("MinButton", this);
+            var maxButton = (Button)Template.FindName("MaxButton", this);
+            minButton.Visibility = Visibility.Collapsed;
+            maxButton.Visibility = Visibility.Collapsed;
+            ResizeMode = ResizeMode.NoResize;
         }
     }
 }
