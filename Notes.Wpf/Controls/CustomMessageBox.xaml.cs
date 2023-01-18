@@ -8,6 +8,7 @@ namespace Notes.Wpf.Controls
     {
         private static CustomMessageBox? _messageBox;
         private static MessageBoxResult _result = MessageBoxResult.None;
+        private bool _correctClosing = false;
 
         public CustomMessageBox()
         {
@@ -70,6 +71,7 @@ namespace Notes.Wpf.Controls
             else
                 _result = MessageBoxResult.None;
 
+            _correctClosing = true;
             Close();
         }
 
@@ -80,6 +82,12 @@ namespace Notes.Wpf.Controls
             minButton.Visibility = Visibility.Collapsed;
             maxButton.Visibility = Visibility.Collapsed;
             ResizeMode = ResizeMode.NoResize;
+        }
+
+        private void ClosedWindow(object sender, System.EventArgs e)
+        {
+            if(_correctClosing == false)
+                _result = MessageBoxResult.None;
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.Win32;
 using Notes.Model;
 using Notes.Repository;
+using Notes.SqliteRepository;
 using Notes.Wpf.Controls;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -13,13 +15,17 @@ namespace Notes
 {
     public partial class ConfigurationWindow : Window
     {
-        IMemoRepository _repository;
+        private IMemoRepository _repository;
 
         public ConfigurationWindow(IMemoRepository repository)
         {
             InitializeComponent();
             _repository = repository;
+            DbContext = (DataContext?)App.ServiceProvider.GetService(typeof(DataContext)) ?? throw new Exception("Db is null.");
+            DataContext = this;
         }
+
+        public DataContext DbContext { get; }
 
         private void ImportClick(object sender, RoutedEventArgs e)
             => Import();

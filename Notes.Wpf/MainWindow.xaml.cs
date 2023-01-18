@@ -25,6 +25,8 @@ namespace Notes
         private Memo? _currentItem;
         private string _filterText = string.Empty;
         private RemoveOption _removeOption = RemoveOption.WithoutRemoved;
+        private bool _fullCreatedDate = false;
+        private bool _fullUpdatedDate = false;
 
         public MainWindow(IMemoRepository repository)
         {
@@ -59,13 +61,38 @@ namespace Notes
         }
 
         public ICommand SaveCommand { get; set; }
-        public RemoveOption RemoveOption 
+        public RemoveOption RemoveOption
         {
             get => _removeOption;
             set
             {
                 _removeOption = value;
                 Load();
+            }
+        }
+
+        public bool FullCreatedDate
+        {
+            get => _fullCreatedDate;
+            set
+            {
+                if (_fullCreatedDate != value)
+                {
+                    _fullCreatedDate = value;
+                    OnPropertyChanged(nameof(FullCreatedDate));
+                }
+            }
+        }
+        public bool FullUpdatedDate
+        {
+            get => _fullUpdatedDate;
+            set
+            {
+                if (_fullUpdatedDate != value)
+                {
+                    _fullUpdatedDate = value;
+                    OnPropertyChanged(nameof(FullUpdatedDate));
+                }
             }
         }
 
@@ -136,7 +163,7 @@ namespace Notes
         {
             if (CurrentItem == null) return;
 
-            if(CurrentItem.Id == 0)
+            if (CurrentItem.Id == 0)
                 CurrentItem = null;
             else
             {
@@ -336,6 +363,41 @@ namespace Notes
             }
 
             return result.ToString();
+        }
+
+        private void CreatedDateChangeMode(object sender, MouseButtonEventArgs e)
+        {
+            FullCreatedDate = !FullCreatedDate;
+            if(FullCreatedDate)
+            {
+                var binding = ShortInsertedDateTextBlock.GetBindingExpression(VisibilityProperty);
+                Binding bindingCopy = new Binding(binding.ParentBinding.Path.Path);
+                bindingCopy.Converter = binding.ParentBinding.Converter;
+                bindingCopy.ConverterParameter = binding.ParentBinding.ConverterParameter;
+                bindingCopy.Mode = binding.ParentBinding.Mode;
+                FullInsertedDateTextBlock.SetBinding(VisibilityProperty, bindingCopy);
+            }
+            else
+            {
+                FullInsertedDateTextBlock.Visibility = Visibility.Collapsed;
+            }
+        }
+        private void UpdateDateChangeMode(object sender, MouseButtonEventArgs e)
+        {
+            FullUpdatedDate = !FullUpdatedDate;
+            if (FullUpdatedDate)
+            {
+                var binding = ShortUpdatedDateTextBlock.GetBindingExpression(VisibilityProperty);
+                Binding bindingCopy = new Binding(binding.ParentBinding.Path.Path);
+                bindingCopy.Converter = binding.ParentBinding.Converter;
+                bindingCopy.ConverterParameter = binding.ParentBinding.ConverterParameter;
+                bindingCopy.Mode = binding.ParentBinding.Mode;
+                FullUpdatedDateTextBlock.SetBinding(VisibilityProperty, bindingCopy);
+            }
+            else
+            {
+                FullUpdatedDateTextBlock.Visibility = Visibility.Collapsed;
+            }
         }
     }
 

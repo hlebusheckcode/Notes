@@ -26,7 +26,8 @@
                         WindowChrome.IsHitTestVisibleInChrome="True"
                         Margin="5 0 0 5"
                         Width="30"
-                        Click="OpenConfigurationClick"/>
+                        Click="OpenConfigurationClick"
+                        ToolTip="Configuration"/>
             </behaviors:WindowBarBehavior.TopBar>
         </behaviors:WindowBarBehavior>
     </b:Interaction.Behaviors>
@@ -177,14 +178,26 @@
             </TextBox>
 
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+            <TextBlock x:Name="ShortUpdatedDateTextBlock" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                       MouseLeftButtonUp="UpdateDateChangeMode"
                        HorizontalAlignment="Left" FontSize="{StaticResource SmallFontSize}" Margin="5 0 5 5"
-                       Visibility="{Binding CurrentItem.UpdatedDate, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"
-                       Text="{Binding CurrentItem.UpdatedDate, StringFormat=Last update: {0:dd/MM} {0:HH:mm}, Mode=OneWay}"/>
-            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                       Text="{Binding CurrentItem.UpdatedDate, StringFormat=Last update: {0:dd/MM} {0:HH:mm}, Mode=OneWay}"
+                       Visibility="{Binding CurrentItem.UpdatedDate, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
+            <TextBlock x:Name="ShortInsertedDateTextBlock" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                       MouseLeftButtonUp="CreatedDateChangeMode"
                        HorizontalAlignment="Right" FontSize="{StaticResource SmallFontSize}" Margin="5 0 5 5"
                        Text="{Binding CurrentItem.InsertedDate, StringFormat=Created: {0:dd/MM} {0:HH:mm}, Mode=OneWay}"
-                       Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
+                       Visibility="{Binding CurrentItem.InsertedDate, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
+            <TextBlock x:Name="FullUpdatedDateTextBlock" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                       MouseLeftButtonUp="UpdateDateChangeMode" Background="{StaticResource PrimarySolidBrush1}"
+                       HorizontalAlignment="Left" FontSize="{StaticResource SmallFontSize}" Margin="5 0 5 5"
+                       Text="{Binding CurrentItem.UpdatedDate, StringFormat=Last update: {0:dd/MM/yyyy} {0:HH:mm:ss}, Mode=OneWay}"
+                       Visibility="Collapsed"/>
+            <TextBlock x:Name="FullInsertedDateTextBlock" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                       MouseLeftButtonUp="CreatedDateChangeMode" Background="{StaticResource PrimarySolidBrush1}"
+                       HorizontalAlignment="Right" FontSize="{StaticResource SmallFontSize}" Margin="5 0 5 5"
+                       Text="{Binding CurrentItem.InsertedDate, StringFormat=Created: {0:dd/MM/yyyy} {0:HH:mm:ss}, Mode=OneWay}"
+                       Visibility="Collapsed"/>
 
             <Border Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="4">
                 <Border.Style>

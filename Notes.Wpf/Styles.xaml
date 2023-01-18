@@ -818,6 +818,41 @@
         </Setter>
     </Style>
 
+    <Style x:Key="{x:Type ContextMenu}" TargetType="{x:Type ContextMenu}">
+        <Setter Property="Padding" Value="4 3 4 2" />
+        <Setter Property="Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}" />
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" />
+        <Setter Property="FontSize" Value="{StaticResource MediumFontSize}" />
+        <Setter Property="Background" Value="{StaticResource PrimarySolidBrush1}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimarySolidBrush4}"/>
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Grid.IsSharedSizeScope" Value="true" />
+        <Setter Property="HasDropShadow" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContextMenu}">
+                    <Border x:Name="Border"
+                            CornerRadius="{StaticResource SmallRadius}"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="1"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Padding="{TemplateBinding Padding}">
+                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasDropShadow" Value="true">
+                            <Setter TargetName="Border" Property="Padding" Value="0,3,0,3" />
+                            <Setter TargetName="Border" Property="CornerRadius" Value="4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <ControlTemplate x:Key="ComboBoxToggleButton"
                  TargetType="{x:Type ToggleButton}">
         <Grid>
