@@ -6,7 +6,7 @@ namespace Notes.Controls.Converters
 {
     public class EnumToIntegerConverter : IValueConverter
     {
-        public static EnumToIntegerConverter Instance = new();
+        public static EnumToIntegerConverter Instance { get; } = new();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

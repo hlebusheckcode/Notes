@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 
-namespace Notes.Wpf
+namespace Notes.Wpf.Controls.Themes
 {
     internal static class LocalExtensions
     {

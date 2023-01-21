@@ -6,10 +6,10 @@
         xmlns:helpers="clr-namespace:Notes.Controls.Helpers"
         xmlns:local="clr-namespace:Notes"
         mc:Ignorable="d"
-        Title="Configuration"
-        Height="101" Width="400"
         WindowStartupLocation="CenterOwner"
+        Title="Configuration" Height="101" Width="400"
         Style="{StaticResource WindowStyle}"
+        Loaded="LoadedWindow"
         d:DataContext="{d:DesignInstance local:ConfigurationWindow}">
 
     <Window.Resources>

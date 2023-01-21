@@ -12,7 +12,7 @@
         mc:Ignorable="d"
         Icon="notes.ico"
         x:Name="MotherWindow"
-        Title="Notes" Height="450" Width="700" MinWidth="450"
+        Title="Notes" Height="450" Width="700" MinHeight="240" MinWidth="640"
         Loaded="WindowLoaded"
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource WindowStyle}"
@@ -136,7 +136,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBox x:Name="Header" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Margin="5"
-                     LostKeyboardFocus="SaveItemEvent"
+                     LostKeyboardFocus="SaveItemEvent" TabIndex="2"
                      Text="{Binding CurrentItem.Header, UpdateSourceTrigger=PropertyChanged}"
                      helpers:TextBoxHelper.Watermark="Header"
                      Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
@@ -163,7 +163,7 @@
                       helpers:CheckBoxHelper.CheckedContent="&#x33;"
                       Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
 
-            <TextBox x:Name="BodyTextBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
+            <TextBox x:Name="BodyTextBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" TabIndex="3"
                      Style="{DynamicResource SearchTextBox}" Margin="5 0 5 5" AcceptsReturn="True" AcceptsTab="True"
                      Text="{Binding CurrentItem.Body, UpdateSourceTrigger=PropertyChanged}"
                      TextWrapping="{Binding CurrentItem.BodyProperties.Wrapping, Mode=OneWay, Converter={x:Static converters:BoolToTextWrappingConverter.Instance}}"
@@ -176,7 +176,6 @@
                     <behaviors:SearchBehavior/>
                 </b:Interaction.Behaviors>
             </TextBox>
-
 
             <TextBlock x:Name="ShortUpdatedDateTextBlock" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
                        MouseLeftButtonUp="UpdateDateChangeMode"
@@ -225,7 +224,7 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="Auto" MinWidth="200"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -237,6 +236,7 @@
                             Style="{StaticResource TransparentIconButton}" Margin="0 5 5 5"
                             Content="&#x23;" Focusable="False"
                             Click="CloseFilterClick"/>
+                    
                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5"
                                Text="Show notes"/>
                     <ComboBox Grid.Row="0" Grid.Column="1" Margin="0 5 5 5"
@@ -245,7 +245,40 @@
                         <ComboBoxItem Content="All"/>
                         <ComboBoxItem Content="Only removed"/>
                     </ComboBox>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5 0 5 5"
+                               Text="Search mode"/>
+                    <Border Grid.Row="1" Grid.Column="1" Margin="0 0 5 5" Height="23">
+                        <Border.Style>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="VerticalAlignment" Value="Top" />
+                                <Setter Property="HorizontalAlignment" Value="Left" />
+                                <Setter Property="CornerRadius" Value="{StaticResource MediumRadius}" />
+                                <Setter Property="TextBlock.Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}" />
+                                <Setter Property="TextBlock.FontFamily" Value="{StaticResource DefaultFont}" />
+                                <Setter Property="TextBlock.FontSize" Value="{StaticResource MediumFontSize}" />
+                                <Setter Property="Background" Value="{StaticResource PrimarySolidBrush1}"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource PrimarySolidBrush4}"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                            </Style>
+                        </Border.Style>
+                        <UniformGrid Rows="1">
+                            <RadioButton Content="All" IsChecked="{Binding SearchMode, Converter={x:Static converters:EnumToBoolConverter.Instance}, ConverterParameter={x:Static local:SearchMode.All}}"/>
+                            <RadioButton Content="Headers" IsChecked="{Binding SearchMode, Converter={x:Static converters:EnumToBoolConverter.Instance}, ConverterParameter={x:Static local:SearchMode.Headers}}"/>
+                            <RadioButton Content="Contents" IsChecked="{Binding SearchMode, Converter={x:Static converters:EnumToBoolConverter.Instance}, ConverterParameter={x:Static local:SearchMode.Contents}}"/>
+                        </UniformGrid>
+                    </Border>
                 </Grid>
+                <Border.Effect>
+                    <DropShadowEffect Color="black"
+                                      Opacity="0.5"
+                                      BlurRadius="7"
+                                      ShadowDepth="2"
+                                      Direction="315"/>
+                </Border.Effect>
             </Border>
         </Grid>
     </Grid>

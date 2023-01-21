@@ -19,6 +19,13 @@ using System.Windows.Media;
 
 namespace Notes
 {
+    public enum SearchMode
+    {
+        All,
+        Headers,
+        Contents
+    }
+
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private IMemoRepository _repository;
@@ -27,6 +34,7 @@ namespace Notes
         private RemoveOption _removeOption = RemoveOption.WithoutRemoved;
         private bool _fullCreatedDate = false;
         private bool _fullUpdatedDate = false;
+        private SearchMode _searchMode = SearchMode.All;
 
         public MainWindow(IMemoRepository repository)
         {
@@ -67,7 +75,8 @@ namespace Notes
             set
             {
                 _removeOption = value;
-                Load();
+                var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
+                collectionView.Refresh();
             }
         }
 
@@ -96,10 +105,21 @@ namespace Notes
             }
         }
 
+        public SearchMode SearchMode
+        {
+            get => _searchMode;
+            set
+            {
+                _searchMode = value;
+                var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
+                collectionView.Refresh();
+            }
+        }
+
         private async Task Load()
         {
             Items.Clear();
-            var items = await _repository.Get(RemoveOption);
+            var items = await _repository.Get();
             foreach (var item in items)
                 Items.Add(item);
         }
@@ -285,9 +305,12 @@ namespace Notes
                 if (memo == null)
                     return false;
 
-                if (string.IsNullOrEmpty(FilterText)
-                    || DeepContains(memo.Header, FilterText)
-                    || memo.Body.Contains(FilterText, StringComparison.OrdinalIgnoreCase))
+                if ((string.IsNullOrEmpty(FilterText)
+                    || (SearchMode != SearchMode.Contents && DeepContains(memo.Header, FilterText))
+                    || (SearchMode != SearchMode.Headers && memo.Body.Contains(FilterText, StringComparison.OrdinalIgnoreCase)))
+                 && (RemoveOption == RemoveOption.All
+                    || (RemoveOption == RemoveOption.WithoutRemoved && memo.Removed == false)
+                    || (RemoveOption == RemoveOption.OnlyRemoved && memo.Removed == true)))
                     return true;
 
                 return false;

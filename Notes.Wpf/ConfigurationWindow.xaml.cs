@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Notes
@@ -82,6 +83,15 @@ namespace Notes
                     (SolidColorBrush)Application.Current.FindResource("InformationSolidBrush"),
                     MessageBoxButton.OK);
             }
+        }
+
+        private void LoadedWindow(object sender, RoutedEventArgs e)
+        {
+            var minButton = (Button)Template.FindName("MinButton", this);
+            var maxButton = (Button)Template.FindName("MaxButton", this);
+            minButton.Visibility = Visibility.Collapsed;
+            maxButton.Visibility = Visibility.Collapsed;
+            ResizeMode = ResizeMode.NoResize;
         }
     }
 }

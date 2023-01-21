@@ -439,178 +439,6 @@
         </Setter>
     </Style>
 
-    <Style x:Key="BaseTextBox" TargetType="{x:Type TextBoxBase}">
-        <Setter Property="Height" Value="{StaticResource DefaultHeight}"/>
-        <Setter Property="FontSize" Value="{StaticResource MediumFontSize}"/>
-        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
-        <Setter Property="Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}"/>
-        <Setter Property="Background" Value="{StaticResource PrimarySolidBrush1}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="BorderBrush" Value="{StaticResource PrimarySolidBrush4}"/>
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="OverridesDefaultStyle" Value="True" />
-        <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="MinWidth" Value="120" />
-        <Setter Property="AllowDrop" Value="True" />
-        <Setter Property="Margin" Value="3" />
-        <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
-    </Style>
-
-    <Style x:Key="DefaultTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource BaseTextBox}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type TextBox}">
-                    <Grid x:Name="OuterGrid">
-                        <Grid x:Name="ContentGrid">
-                            <Border Name="Border"
-                                    CornerRadius="{StaticResource MediumRadius}"
-                                    Background="{TemplateBinding Background}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    BorderBrush="{TemplateBinding BorderBrush}">
-                                <Grid x:Name="InnerGrid">
-                                    <DockPanel>
-                                        <Button x:Name="ClearButton"
-                                                Style="{StaticResource ClearTextButton}"
-                                                Visibility="{TemplateBinding helpers:TextBoxHelper.ClearTextButton, Converter={x:Static converters:BoolToVisibilityConverter.Instance}}"
-                                                DockPanel.Dock="Right"
-                                                Command="{x:Static helpers:TextBoxHelper.ClearTextBoxCommand}"
-                                                CommandParameter="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}}"
-                                                Margin="0"/>
-                                        <Grid>
-                                            <TextBlock x:Name="Watermark" VerticalAlignment="Top" Margin="2"
-                                                       Visibility="Collapsed"
-                                                       Style="{StaticResource DefaultTextBlock}"
-                                                       Foreground="{StaticResource PrimarySolidBrush3}"
-                                                       Text="{TemplateBinding helpers:TextBoxHelper.Watermark}"/>
-                                            <ScrollViewer Grid.Column="0" x:Name="PART_ContentHost" Margin="2"/>
-                                        </Grid>
-                                    </DockPanel>
-                                </Grid>
-                            </Border>
-                            <Border x:Name="FocusBorder" Visibility="Hidden"
-                                    CornerRadius="{StaticResource MediumRadius}"
-                                    BorderThickness="0 0 0 3"
-                                    BorderBrush="{StaticResource PrimarySolidBrush3}"/>
-                        </Grid>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="Text" Value="">
-                            <Setter TargetName="ClearButton" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="FocusBorder" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="FocusBorder" Property="Border.BorderBrush" Value="{StaticResource AccentSolidBrush}"/>
-                            <Setter TargetName="ClearButton" Property="Margin" Value="0 0 0 2"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="true">
-                            <Setter TargetName="FocusBorder" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="ClearButton" Property="Margin" Value="0 0 0 2"/>
-                        </Trigger>
-                        <Trigger Property="AcceptsReturn" Value="True">
-                            <Setter TargetName="ClearButton" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="Text" Value=""/>
-                                <Condition Property="IsKeyboardFocused" Value="False"/>
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="Watermark" Property="Visibility" Value="Visible"/>
-                        </MultiTrigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="SearchTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource BaseTextBox}">
-        <Setter Property="Height" Value="Auto"/>
-        <Setter Property="IsInactiveSelectionHighlightEnabled" Value="True"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type TextBox}">
-                    <Grid>
-                        <Border Name="Border"
-                            CornerRadius="{StaticResource MediumRadius}"
-                            Background="{TemplateBinding Background}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            BorderBrush="{TemplateBinding BorderBrush}">
-                            <Grid>
-                                <ScrollViewer x:Name="PART_ContentHost" Grid.RowSpan="2" Grid.ColumnSpan="5" Margin="2 2 0 0"/>
-                                <TextBlock x:Name="Watermark" VerticalAlignment="Top" Margin="2"
-                                       Visibility="Collapsed"
-                                       Style="{StaticResource DefaultTextBlock}"
-                                       Foreground="{StaticResource PrimarySolidBrush3}"
-                                       Text="{TemplateBinding helpers:TextBoxHelper.Watermark}"/>
-                                <Border CornerRadius="{StaticResource MediumRadius}" Margin="0 0 18 0"
-                                    VerticalAlignment="Top" HorizontalAlignment="Right"
-                                    Padding="0" BorderThickness="1 0 1 1" ClipToBounds="True"
-                                    Background="{StaticResource PrimarySolidBrush1}"
-                                    BorderBrush="{StaticResource PrimarySolidBrush4}"
-                                    Visibility="{TemplateBinding behaviors:SearchBehavior.SearchVisibility}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBox x:Name="SearchTextBox" Grid.Column="0" IsReadOnly="False"
-                                             Style="{StaticResource DefaultTextBox}"
-                                             helpers:TextBoxHelper.Watermark="Search"/>
-                                        <Button x:Name="PreviousButton" Grid.Column="1" Content="&#x20;"
-                                            Style="{StaticResource TransparentIconButton}"
-                                            DockPanel.Dock="Right"/>
-                                        <Button x:Name="NextButton" Grid.Column="2" Content="&#x21;"
-                                            Style="{StaticResource TransparentIconButton}"
-                                            DockPanel.Dock="Right"/>
-                                        <TextBlock x:Name="MatchesCount" Grid.Column="3" Margin="3 5 3 3"
-                                               Style="{StaticResource DefaultTextBlock}"
-                                               VerticalAlignment="Center"
-                                               TextAlignment="Center"
-                                               Width="40"/>
-                                        <Button x:Name="CloseButton" Grid.Column="4" Content="&#x23;"
-                                            Style="{StaticResource TransparentIconButton}"
-                                            Command="{TemplateBinding behaviors:SearchBehavior.CloseCommand}"/>
-                                    </Grid>
-                                </Border>
-                            </Grid>
-                        </Border>
-                        <Border x:Name="FocusBorder" Visibility="Hidden"
-                                    CornerRadius="{StaticResource MediumRadius}"
-                                    BorderThickness="0 0 0 3"
-                                    BorderBrush="{StaticResource PrimarySolidBrush3}"/>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter TargetName="FocusBorder" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="FocusBorder" Property="Border.BorderBrush" Value="{StaticResource AccentSolidBrush}"/>
-                            <Setter TargetName="PART_ContentHost" Property="Margin" Value="2 2 0 2"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="true">
-                            <Setter TargetName="FocusBorder" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="PART_ContentHost" Property="Margin" Value="2 2 0 2"/>
-                        </Trigger>
-                        <!--<Trigger Property="Text" Value="">
-                            <Setter TargetName="ClearButton" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>-->
-                        <!--<Trigger Property="AcceptsReturn" Value="True">
-                            <Setter TargetName="ClearButton" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>-->
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="Text" Value=""/>
-                                <Condition Property="IsKeyboardFocused" Value="False"/>
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="Watermark" Property="Visibility" Value="Visible"/>
-                        </MultiTrigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style x:Key="DefaultCheckBox" TargetType="{x:Type CheckBox}">
         <Setter Property="Height" Value="{StaticResource DefaultHeight}"/>
         <Setter Property="FontSize" Value="{StaticResource MediumFontSize}"/>
@@ -1004,6 +832,50 @@
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource PrimarySolidBrush3}"/>
                             <Setter TargetName="Border" Property="TextBlock.Foreground" Value="{StaticResource ForegroundAccentSolidBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="{x:Type RadioButton}" TargetType="{x:Type RadioButton}">
+        <Setter Property="Height" Value="21"/>
+        <Setter Property="FontSize" Value="{StaticResource MediumFontSize}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}"/>
+        <Setter Property="Background" Value="{StaticResource PrimarySolidBrush1}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimarySolidBrush4}"/>
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Padding" Value="5 0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RadioButton}">
+                    <Border x:Name="Border"
+                            CornerRadius="{StaticResource SmallRadius}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Margin="0 1 0 -1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource PrimarySolidBrush2}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource PrimarySolidBrush3}"/>
+                            <Setter Property="Foreground" Value="{StaticResource ForegroundAccentSolidBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimarySolidBrush2}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
