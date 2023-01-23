@@ -50,8 +50,8 @@ namespace Baza.Model
             if(HasChanges)
             {
                 var type = GetType();
-                foreach (var property in _oldProperties)
-                    type.GetProperty(property.Key).SetValue(this, property.Value, null);
+                foreach (var property in _oldProperties!)
+                    type.GetProperty(property.Key)?.SetValue(this, property.Value, null);
             }
         }
 

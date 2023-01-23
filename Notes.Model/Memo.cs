@@ -7,6 +7,8 @@ namespace Notes.Model
 {
     public class Memo : Entity, IAuditableEntity
     {
+        #region Private variables
+
         private int _id;
         private string _header = string.Empty;
         private string _body = string.Empty;
@@ -14,6 +16,10 @@ namespace Notes.Model
         private DateTime _insertedDate;
         private DateTime? _updatedDate;
         private DateTime? _removedDate;
+
+        #endregion Private variables
+
+        #region Public properties
 
         [Key, JsonIgnore]
         public int Id
@@ -60,9 +66,15 @@ namespace Notes.Model
         [NotMapped, JsonIgnore]
         public bool Removed => RemovedDate.HasValue && RemovedDate < DateTime.Now;
 
+        #endregion Public properties
+
+        #region Public methods
+
         public override object? GetIdentifier() => Id;
         public override void SetIdentifier(object identifier) => Id = Convert.ToInt32(identifier);
 
         public override string ToString() => Header;
+
+        #endregion Public properties
     }
 }

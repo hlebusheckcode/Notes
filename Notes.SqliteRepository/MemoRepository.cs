@@ -86,12 +86,10 @@ namespace Notes.SqliteRepository
 
         public async Task Import(IEnumerable<Memo> items)
         {
-            _dataContext.AutoSetInsertedDate = false;
-            _dataContext.AutoSetUpdatedDate = false;
+            _dataContext.AutoSetInsertedDate = _dataContext.AutoSetUpdatedDate = false;
             await _dataContext.Memos.AddRangeAsync(items);
             await _dataContext.SaveChangesAsync();
-            _dataContext.AutoSetInsertedDate = true;
-            _dataContext.AutoSetUpdatedDate = true;
+            _dataContext.AutoSetInsertedDate = _dataContext.AutoSetUpdatedDate = true;
         }
     }
 }
