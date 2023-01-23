@@ -1,0 +1,229 @@
+﻿<ResourceDictionary x:Class="Notes.Wpf.Controls.Themes.WindowStyle"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:behaviors="clr-namespace:Notes.Controls.Behaviors">
+
+    <Style x:Key="WindowStyleTitleBarButton" TargetType="{x:Type Button}">
+        <Setter Property="Focusable" Value="false" />
+        <Setter Property="Height" Value="Auto"/>
+        <Setter Property="Width" Value="40"/>
+        <Setter Property="FontSize" Value="{StaticResource MediumFontSize}"/>
+        <Setter Property="FontFamily" Value="{StaticResource Icons}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid x:Name="OuterGrid">
+                        <Grid x:Name="ContentGrid">
+                            <Border x:Name="Border"
+                                    CornerRadius="{StaticResource SmallRadius}"
+                                    Background="{TemplateBinding Background}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{TemplateBinding BorderBrush}">
+                                <Grid x:Name="InnerGrid" Margin="2">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      RecognizesAccessKey="True"/>
+                                </Grid>
+                            </Border>
+                            <Border x:Name="FocusBorder" Visibility="Hidden"
+                                    CornerRadius="{StaticResource MediumRadius}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource AccentSolidBrush}"/>
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource PrimarySolidBrush2}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource AccentSolidBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource ForegroundAccentSolidBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimarySolidBrush2}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="AdditionalStyleTitleBarButton" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowStyleTitleBarButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid x:Name="OuterGrid">
+                        <Grid x:Name="ContentGrid">
+                            <Border x:Name="Border"
+                                    CornerRadius="0 0 5 5"
+                                    Background="{TemplateBinding Background}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{TemplateBinding BorderBrush}">
+                                <Grid x:Name="InnerGrid" Margin="2">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      RecognizesAccessKey="True"/>
+                                </Grid>
+                            </Border>
+                            <Border x:Name="FocusBorder" Visibility="Hidden"
+                                    CornerRadius="{StaticResource MediumRadius}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource AccentSolidBrush}"/>
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource PrimarySolidBrush2}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource AccentSolidBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource ForegroundAccentSolidBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource PrimarySolidBrush2}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style x:Key="WindowStyle" TargetType="{x:Type Window}">
+        <Setter Property="WindowStyle" Value="None" />
+        <Setter Property="AllowsTransparency" Value="true" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="ResizeMode" Value="CanResizeWithGrip" />
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome
+                    NonClientFrameEdges="None"
+                    GlassFrameThickness="0"
+                    ResizeBorderThickness="7"
+                    CaptionHeight="32"
+                />
+            </Setter.Value>
+        </Setter>
+        <EventSetter Event="Loaded" Handler="WindowLoaded" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Window}">
+                    <Border
+                        x:Name="PART_Container"
+                        Padding="7 7 7 5"
+                        >
+                        <Grid>
+                            <Border
+                                CornerRadius="{StaticResource MediumRadius}"
+                            x:Name="PART_Border"
+                            Width="Auto"
+                            Height="Auto"
+                            Background="{StaticResource PrimarySolidBrush1}"
+                            BorderBrush="{StaticResource PrimarySolidBrush4}"
+                            BorderThickness="1"
+                            Padding="0">
+                                <DockPanel
+                                HorizontalAlignment="Stretch"
+                                Background="Transparent"
+                                VerticalAlignment="Stretch"
+                                >
+                                    <Border
+                                        CornerRadius="{StaticResource SmallRadius}"
+                                    x:Name="TitleBar"
+                                    DockPanel.Dock="Top"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    >
+                                        <Grid Height="29">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image
+                                            x:Name="Icon"
+                                            Grid.Column="0"
+                                            Source="{Binding Path=Icon, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" 
+                                            HorizontalAlignment="Right"
+                                            Margin="3"
+                                            MouseUp="IconMouseUp"
+                                            MouseLeftButtonDown="IconMouseLeftButtonDown"
+                                            WindowChrome.IsHitTestVisibleInChrome="True"
+                                            />
+                                            <TextBlock Grid.Column="1"
+                                            x:Name="Caption" VerticalAlignment="Center"
+                                                Style="{StaticResource DefaultTextBlock}"
+                                                       FontSize="{StaticResource LargeFontSize}"
+                                            HorizontalAlignment="Left" FontFamily="{StaticResource DefaultFont}"
+                                            Text="{Binding Path=Title, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                            />
+                                            <ContentControl x:Name="TopBarControl" Grid.Column="2"
+                                                            Content="{TemplateBinding behaviors:WindowBarBehavior.AttachedTopBar}"/>
+                                            <Button
+                                            x:Name="MinButton" Content="&#x25;"
+                                            Grid.Column="3"
+                                            Style="{StaticResource WindowStyleTitleBarButton}"
+                                            Click="MinButtonClick"
+                                            WindowChrome.IsHitTestVisibleInChrome="True"/>
+                                            <Button
+                                            Grid.Column="4" Content="&#x29;"
+                                            x:Name="MaxButton"
+                                            Style="{StaticResource WindowStyleTitleBarButton}"
+                                            Click="MaxButtonClick"
+                                            WindowChrome.IsHitTestVisibleInChrome="True"/>
+                                            <Button
+                                            Grid.Column="5" Content="&#x23;"
+                                            x:Name="CloseButton" 
+                                            Style="{StaticResource WindowStyleTitleBarButton}"
+                                            Click="CloseButtonClick"
+                                            WindowChrome.IsHitTestVisibleInChrome="True"/>
+                                        </Grid>
+                                    </Border>
+                                    <ContentPresenter />
+                                </DockPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="WindowStyle" Value="ToolWindow">
+                            <Setter TargetName="MinButton" Property="Button.Visibility" Value="Collapsed"/>
+                            <Setter TargetName="MaxButton" Property="Button.Visibility" Value="Collapsed"/>
+                            <Setter TargetName="Icon" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="WindowState" Value="Maximized">
+                            <Setter TargetName="MaxButton" Property="Button.Content" Value="&#x26;"/>
+                        </Trigger>
+                        <Trigger Property="WindowState" Value="Normal">
+                            <Setter TargetName="PART_Border" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect
+                                        Color="black"
+                                        Opacity="0.5"
+                                        BlurRadius="7"
+                                        ShadowDepth="2"
+                                        Direction="315"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsActive" Value="False">
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{StaticResource PrimarySolidBrush3}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

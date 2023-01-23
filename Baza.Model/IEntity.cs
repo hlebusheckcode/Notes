@@ -1,8 +1,8 @@
-﻿namespace Baza.Models
+﻿namespace Baza.Model
 {
     public interface IEntity
     {
-        public bool IsNew { get; }
+        public bool New { get; }
         public bool TrackChanges { get; set; }
         public bool HasChanges { get; }
 

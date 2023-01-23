@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Baza.Models
+namespace Baza.Model
 {
     public interface INotifyEntity : IEntity, INotifyPropertyChanged
     {

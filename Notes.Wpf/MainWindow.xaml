@@ -8,11 +8,29 @@
         xmlns:converters="clr-namespace:Notes.Controls.Converters"
         xmlns:behaviors="clr-namespace:Notes.Controls.Behaviors"
         xmlns:helpers="clr-namespace:Notes.Controls.Helpers"
+        xmlns:repository="clr-namespace:Notes.Repository;assembly=Notes.Repository"
         mc:Ignorable="d"
-        Title="Notes" Height="450" Width="700" MinWidth="450"
+        Icon="notes.ico"
+        x:Name="MotherWindow"
+        Title="Notes" Height="450" Width="700" MinHeight="240" MinWidth="640"
         Loaded="WindowLoaded"
         WindowStartupLocation="CenterScreen"
+        Style="{StaticResource WindowStyle}"
         d:DataContext="{d:DesignInstance local:MainWindow}">
+    <b:Interaction.Behaviors>
+        <behaviors:WindowBarBehavior>
+            <behaviors:WindowBarBehavior.TopBar>
+                <Button Style="{StaticResource AdditionalStyleTitleBarButton}"
+                        Content="&#x24;"
+                        HorizontalAlignment="Left"
+                        WindowChrome.IsHitTestVisibleInChrome="True"
+                        Margin="5 0 0 5"
+                        Width="30"
+                        Click="OpenConfigurationClick"
+                        ToolTip="Configuration"/>
+            </behaviors:WindowBarBehavior.TopBar>
+        </behaviors:WindowBarBehavior>
+    </b:Interaction.Behaviors>
 
     <Window.InputBindings>
         <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveCommand}"/>
@@ -23,7 +41,7 @@
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource DefaultButton}"/>
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DefaultTextBlock}"/>
     </Window.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250" MinWidth="250"/>
@@ -33,27 +51,42 @@
         <DockPanel Grid.Column="0">
             <UniformGrid Rows="1" DockPanel.Dock="Top" Margin="0 5">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button Click="ImportClick" Style="{StaticResource IconButton}" Content="&#x20;" Margin="5 0 5 0"
-                            ToolTip="Import"/>
-                    <Button Click="ExportClick" Style="{StaticResource IconButton}" Content="&#x21;" Margin="0 0 5 0"
-                            ToolTip="Export"/>
-                </StackPanel>
-                
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Click="AddClick" Style="{StaticResource IconButton}" Content="&#x26;" Margin="5 0 5 0"
-                            ToolTip="Create new"/>
-                    <Button Click="DeleteClick" Style="{StaticResource IconButton}" Content="&#x28;" Margin="0 0 5 0"
+                    <Button Click="RefreshClick" Style="{StaticResource TransparentIconButton}" Margin="5 0 0 0"
+                            Content="&#x34;"
+                            ToolTip="Refresh data"/>
+                    <Button Click="RemoveClick" Style="{StaticResource TransparentIconButton}" Margin="5 0 0 0"
+                            Content="&#x28;" Visibility="{Binding CurrentItem.Removed, Converter={x:Static converters:BoolToVisibilityConverter.Instance}, ConverterParameter=invert}"
+                            IsEnabled="{Binding CurrentItem, Converter={x:Static converters:NullToBoolConverter.Instance}}"
+                            ToolTip="Remove selected"/>
+                    <Button Click="DeleteClick" Style="{StaticResource TransparentIconButton}" Margin="5 0 0 0"
+                            Content="&#x45;" Visibility="{Binding CurrentItem.Removed, Converter={x:Static converters:BoolToVisibilityConverter.Instance}, FallbackValue=Collapsed}"
                             IsEnabled="{Binding CurrentItem, Converter={x:Static converters:NullToBoolConverter.Instance}}"
                             ToolTip="Delete selected"/>
-                    <Button Click="RefreshClick" Style="{StaticResource IconButton}" Content="&#x27;" Margin="0 0 5 0"
-                            ToolTip="Refresh data"/>
+                    <Button Click="RecoverClick" Style="{StaticResource TransparentIconButton}" Margin="5 0 0 0"
+                            Content="&#x46;" Visibility="{Binding CurrentItem.Removed, Converter={x:Static converters:BoolToVisibilityConverter.Instance}, FallbackValue=Collapsed}"
+                            IsEnabled="{Binding CurrentItem, Converter={x:Static converters:NullToBoolConverter.Instance}}"
+                            ToolTip="Recover selected"/>
+                    <Button Click="AddClick" Style="{StaticResource TransparentIconButton}" Margin="5 0 0 0"
+                            Content="&#x22;"
+                            ToolTip="Create new"/>
                 </StackPanel>
             </UniformGrid>
 
-            <TextBox DockPanel.Dock="Top" Margin="5 0 5 5" TabIndex="1"
-                     Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
-                     helpers:TextBoxHelper.ClearTextButton="True"
-                     helpers:TextBoxHelper.Watermark="Search"/>
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBox Grid.Column="0" Margin="5 0 5 5" TabIndex="1"
+                         Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                         helpers:TextBoxHelper.ClearTextButton="True"
+                         helpers:TextBoxHelper.Watermark="Search"/>
+
+                <CheckBox x:Name="ShowFilter" Grid.Column="1" Style="{StaticResource IconCheckBox}"
+                          Content="&#x42;" Margin="0 0 5 5"
+                          ToolTip="Filter"/>
+            </Grid>
 
             <ListBox x:Name="MemoList" Margin="5 0 5 5" TabIndex="2"
                      Style="{StaticResource DefaultListBox}"
@@ -62,45 +95,191 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <TextBlock Text="{Binding Header}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                       Text="{Binding Header}"
                                        Visibility="{Binding Header, Converter={x:Static converters:EmptyToVisibilityConverter.Instance}}"/>
-                            <TextBlock TextTrimming="CharacterEllipsis"
+                            <TextBlock Grid.Column="0" TextTrimming="CharacterEllipsis"
                                        Text="{Binding Body, Converter={x:Static converters:SingleLineTextConverter.Instance}}"
                                        Visibility="{Binding Header, Converter={x:Static converters:EmptyToVisibilityConverter.Instance}, ConverterParameter=invert}"/>
+                            <TextBlock x:Name="FavoriteIcon" Grid.Column="1" Visibility="Collapsed" VerticalAlignment="Center"
+                                       FontFamily="{StaticResource Icons}" Text="&#x35;"/>
                         </Grid>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Favorite}" Value="True">
+                                <Setter TargetName="FavoriteIcon" Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Removed}" Value="True">
+                                <Setter Property="Opacity" Value="0.6"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
 
-        <DockPanel Grid.Column="1" FocusManager.IsFocusScope="False"
-                   Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}}">
-            <TextBox x:Name="Header" DockPanel.Dock="Top" Margin="5"
-                     LostKeyboardFocus="SaveItemEvent"
+        <Grid Grid.Column="1" FocusManager.IsFocusScope="False">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="Header" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Margin="5"
+                     LostKeyboardFocus="SaveItemEvent" TabIndex="2"
                      Text="{Binding CurrentItem.Header, UpdateSourceTrigger=PropertyChanged}"
-                     helpers:TextBoxHelper.Watermark="Header"/>
-            <CheckBox Style="{StaticResource TextCheckBox}" FontFamily="{StaticResource Icons}"
-                      IsChecked="{Binding CurrentItem.TextWrapping, UpdateSourceTrigger=PropertyChanged}"
-                      Content="&#x22;" DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="5 0 5 5"
+                     helpers:TextBoxHelper.Watermark="Header"
+                     Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
+
+            <CheckBox Grid.Row="1" Grid.Column="1" Style="{StaticResource IconCheckBox}"
+                      IsChecked="{Binding CurrentItem.Favorite, UpdateSourceTrigger=PropertyChanged}"
+                      Content="&#x35;" HorizontalAlignment="Left" Margin="5 0 0 5"
                       LostKeyboardFocus="SaveItemEvent"
-                      ToolTip="Text wrap"/>
-            <Grid DockPanel.Dock="Bottom" Margin="5 0 5 5">
-                <TextBlock HorizontalAlignment="Left" FontSize="{StaticResource SmallFontSize}"
-                           Visibility="{Binding CurrentItem.UpdatedDate, Converter={x:Static converters:NullToVisibilityConverter.Instance}}"
-                           Text="{Binding CurrentItem.UpdatedDate, StringFormat=LastUpdate: {0:dd/MM} {0:HH:mm}, Mode=OneWay}"/>
-                <TextBlock HorizontalAlignment="Right" FontSize="{StaticResource SmallFontSize}"
-                           Text="{Binding CurrentItem.InsertedDate, StringFormat=Created: {0:dd/MM} {0:HH:mm}, Mode=OneWay}"/>
-            </Grid>
-            <TextBox x:Name="BodyTextBox" Style="{DynamicResource SearchTextBox}" Margin="5 0 5 5" AcceptsReturn="True" AcceptsTab="True"
+                      ToolTip="Favorite"
+                      helpers:CheckBoxHelper.CheckedContent="&#x33;"
+                      Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
+            <CheckBox Grid.Row="1" Grid.Column="2" Style="{StaticResource IconCheckBox}"
+                      IsChecked="{Binding CurrentItem.BodyProperties.Wrapping, UpdateSourceTrigger=PropertyChanged}"
+                      Content="&#x31;" HorizontalAlignment="Left" Margin="5 0 0 5"
+                      LostKeyboardFocus="SaveItemEvent"
+                      ToolTip="Text wrap"
+                      helpers:CheckBoxHelper.CheckedContent="&#x33;"
+                      Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
+            <CheckBox Grid.Row="1" Grid.Column="3" Style="{StaticResource IconCheckBox}"
+                      IsChecked="{Binding CurrentItem.BodyProperties.ReadOnly, UpdateSourceTrigger=PropertyChanged}"
+                      Content="&#x33;" HorizontalAlignment="Right" Margin="5 0 5 5"
+                      LostKeyboardFocus="SaveItemEvent"
+                      ToolTip="Lock"
+                      helpers:CheckBoxHelper.CheckedContent="&#x33;"
+                      Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
+
+            <TextBox x:Name="BodyTextBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" TabIndex="3"
+                     Style="{DynamicResource SearchTextBox}" Margin="5 0 5 5" AcceptsReturn="True" AcceptsTab="True"
                      Text="{Binding CurrentItem.Body, UpdateSourceTrigger=PropertyChanged}"
-                     TextWrapping="{Binding CurrentItem.TextWrapping, UpdateSourceTrigger=PropertyChanged, Converter={x:Static converters:BoolToTextWrappingConverter.Instance}}"
+                     TextWrapping="{Binding CurrentItem.BodyProperties.Wrapping, Mode=OneWay, Converter={x:Static converters:BoolToTextWrappingConverter.Instance}}"
+                     IsReadOnly="{Binding CurrentItem.BodyProperties.ReadOnly, Mode=OneWay}"
                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                      LostKeyboardFocus="SaveItemEvent"
-                     helpers:TextBoxHelper.Watermark="Content">
+                     helpers:TextBoxHelper.Watermark="Content"
+                     Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}">
                 <b:Interaction.Behaviors>
                     <behaviors:SearchBehavior/>
                 </b:Interaction.Behaviors>
             </TextBox>
-        </DockPanel>
+
+            <TextBlock x:Name="ShortUpdatedDateTextBlock" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                       MouseLeftButtonUp="UpdateDateChangeMode"
+                       HorizontalAlignment="Left" FontSize="{StaticResource SmallFontSize}" Margin="5 0 5 5"
+                       Text="{Binding CurrentItem.UpdatedDate, StringFormat=Last update: {0:dd/MM} {0:HH:mm}, Mode=OneWay}"
+                       Visibility="{Binding CurrentItem.UpdatedDate, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
+            <TextBlock x:Name="ShortInsertedDateTextBlock" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                       MouseLeftButtonUp="CreatedDateChangeMode"
+                       HorizontalAlignment="Right" FontSize="{StaticResource SmallFontSize}" Margin="5 0 5 5"
+                       Text="{Binding CurrentItem.InsertedDate, StringFormat=Created: {0:dd/MM} {0:HH:mm}, Mode=OneWay}"
+                       Visibility="{Binding CurrentItem.InsertedDate, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
+            <TextBlock x:Name="FullUpdatedDateTextBlock" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                       MouseLeftButtonUp="UpdateDateChangeMode" Background="{StaticResource PrimarySolidBrush1}"
+                       HorizontalAlignment="Left" FontSize="{StaticResource SmallFontSize}" Margin="5 0 5 5"
+                       Text="{Binding CurrentItem.UpdatedDate, StringFormat=Last update: {0:dd/MM/yyyy} {0:HH:mm:ss}, Mode=OneWay}"
+                       Visibility="Collapsed"/>
+            <TextBlock x:Name="FullInsertedDateTextBlock" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                       MouseLeftButtonUp="CreatedDateChangeMode" Background="{StaticResource PrimarySolidBrush1}"
+                       HorizontalAlignment="Right" FontSize="{StaticResource SmallFontSize}" Margin="5 0 5 5"
+                       Text="{Binding CurrentItem.InsertedDate, StringFormat=Created: {0:dd/MM/yyyy} {0:HH:mm:ss}, Mode=OneWay}"
+                       Visibility="Collapsed"/>
+
+            <Border Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="4">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="OverridesDefaultStyle" Value="true" />
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Setter Property="Margin" Value="0 -5 5 5" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="VerticalAlignment" Value="Top" />
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Setter Property="CornerRadius" Value="{StaticResource MediumRadius}" />
+                        <Setter Property="TextBlock.Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}" />
+                        <Setter Property="TextBlock.FontFamily" Value="{StaticResource DefaultFont}" />
+                        <Setter Property="TextBlock.FontSize" Value="{StaticResource MediumFontSize}" />
+                        <Setter Property="Background" Value="{StaticResource PrimarySolidBrush1}"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource PrimarySolidBrush4}"/>
+                        <Setter Property="BorderThickness" Value="1"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=ShowFilter, Path=IsChecked}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" MinWidth="200"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Right"
+                            Style="{StaticResource TransparentIconButton}" Margin="0 5 5 5"
+                            Content="&#x23;" Focusable="False"
+                            Click="CloseFilterClick"/>
+                    
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5"
+                               Text="Show notes"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="0 5 5 5"
+                              SelectedIndex="{Binding RemoveOption, UpdateSourceTrigger=PropertyChanged, Converter={x:Static converters:EnumToIntegerConverter.Instance}, ConverterParameter={x:Type repository:RemoveOption}}">
+                        <ComboBoxItem Content="Without removed"/>
+                        <ComboBoxItem Content="All"/>
+                        <ComboBoxItem Content="Only removed"/>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5 0 5 5"
+                               Text="Search mode"/>
+                    <Border Grid.Row="1" Grid.Column="1" Margin="0 0 5 5" Height="23">
+                        <Border.Style>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="VerticalAlignment" Value="Top" />
+                                <Setter Property="HorizontalAlignment" Value="Left" />
+                                <Setter Property="CornerRadius" Value="{StaticResource MediumRadius}" />
+                                <Setter Property="TextBlock.Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}" />
+                                <Setter Property="TextBlock.FontFamily" Value="{StaticResource DefaultFont}" />
+                                <Setter Property="TextBlock.FontSize" Value="{StaticResource MediumFontSize}" />
+                                <Setter Property="Background" Value="{StaticResource PrimarySolidBrush1}"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource PrimarySolidBrush4}"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                            </Style>
+                        </Border.Style>
+                        <UniformGrid Rows="1">
+                            <RadioButton Content="All" IsChecked="{Binding SearchMode, Converter={x:Static converters:EnumToBoolConverter.Instance}, ConverterParameter={x:Static local:SearchMode.All}}"/>
+                            <RadioButton Content="Headers" IsChecked="{Binding SearchMode, Converter={x:Static converters:EnumToBoolConverter.Instance}, ConverterParameter={x:Static local:SearchMode.Headers}}"/>
+                            <RadioButton Content="Contents" IsChecked="{Binding SearchMode, Converter={x:Static converters:EnumToBoolConverter.Instance}, ConverterParameter={x:Static local:SearchMode.Contents}}"/>
+                        </UniformGrid>
+                    </Border>
+                </Grid>
+                <Border.Effect>
+                    <DropShadowEffect Color="black"
+                                      Opacity="0.5"
+                                      BlurRadius="7"
+                                      ShadowDepth="2"
+                                      Direction="315"/>
+                </Border.Effect>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

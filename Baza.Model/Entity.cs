@@ -1,19 +1,42 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Baza.Models
+namespace Baza.Model
 {
     public abstract class Entity : IEntity
     {
+        #region Private variables
+
         private Dictionary<string, object?>? _oldProperties;
 
+        #endregion Private variables
+
+        #region Public properties
+
         [NotMapped, JsonIgnore]
-        public bool IsNew => GetIdentifier() == null;
+        public bool New
+        {
+            get
+            {
+                var identifier = GetIdentifier();
+                if (identifier == null)
+                    return true;
+
+                var type = identifier.GetType();
+                if (type.IsValueType && Equals(identifier, Activator.CreateInstance(type)))
+                    return true;
+
+                return false;
+            }
+        }
         [NotMapped, JsonIgnore]
         public bool TrackChanges { get; set; } = true;
         [NotMapped, JsonIgnore]
         public bool HasChanges => _oldProperties?.Any() == true;
+
+        #endregion Public properties
+
+        #region Public methods
 
         public virtual object? GetIdentifier()
             => throw new NotImplementedException();
@@ -27,12 +50,16 @@ namespace Baza.Models
             if(HasChanges)
             {
                 var type = GetType();
-                foreach (var property in _oldProperties)
-                    type.GetProperty(property.Key).SetValue(this, property.Value, null);
+                foreach (var property in _oldProperties!)
+                    type.GetProperty(property.Key)?.SetValue(this, property.Value, null);
             }
         }
 
-        protected bool SetValue<T>(ref T property, T value, string propertyName)
+        #endregion Public methods
+
+        #region Protected methods
+
+        protected virtual bool SetValue<T>(ref T property, T value, string propertyName)
             => SetValue(ref property, value, propertyName, null);
         protected virtual bool SetValue<T>(ref T property, T value, string propertyName, Action<T>? action)
         {
@@ -54,5 +81,7 @@ namespace Baza.Models
 
             return true;
         }
+
+        #endregion Protected methods
     }
 }

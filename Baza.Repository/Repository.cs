@@ -1,6 +1,6 @@
-﻿using Baza.Models;
+﻿using Baza.Model;
 
-namespace Baza.Repositories
+namespace Baza.Repository
 {
     public abstract class Repository<T> : IRepository<T>
         where T : IEntity, new()

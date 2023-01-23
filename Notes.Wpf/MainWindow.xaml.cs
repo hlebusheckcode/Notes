@@ -14,14 +14,27 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using System.IO;
 using System.Text.Json;
+using Notes.Wpf.Controls;
+using System.Windows.Media;
 
 namespace Notes
 {
+    public enum SearchMode
+    {
+        All,
+        Headers,
+        Contents
+    }
+
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private IMemoRepository _repository;
         private Memo? _currentItem;
         private string _filterText = string.Empty;
+        private RemoveOption _removeOption = RemoveOption.WithoutRemoved;
+        private bool _fullCreatedDate = false;
+        private bool _fullUpdatedDate = false;
+        private SearchMode _searchMode = SearchMode.All;
 
         public MainWindow(IMemoRepository repository)
         {
@@ -42,6 +55,7 @@ namespace Notes
                 OnPropertyChanged(nameof(CurrentItem));
             }
         }
+
         public string FilterText
         {
             get => _filterText;
@@ -55,16 +69,67 @@ namespace Notes
         }
 
         public ICommand SaveCommand { get; set; }
+        public RemoveOption RemoveOption
+        {
+            get => _removeOption;
+            set
+            {
+                _removeOption = value;
+                var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
+                collectionView.Refresh();
+            }
+        }
+
+        public bool FullCreatedDate
+        {
+            get => _fullCreatedDate;
+            set
+            {
+                if (_fullCreatedDate != value)
+                {
+                    _fullCreatedDate = value;
+                    OnPropertyChanged(nameof(FullCreatedDate));
+                }
+            }
+        }
+        public bool FullUpdatedDate
+        {
+            get => _fullUpdatedDate;
+            set
+            {
+                if (_fullUpdatedDate != value)
+                {
+                    _fullUpdatedDate = value;
+                    OnPropertyChanged(nameof(FullUpdatedDate));
+                }
+            }
+        }
+
+        public SearchMode SearchMode
+        {
+            get => _searchMode;
+            set
+            {
+                _searchMode = value;
+                var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
+                collectionView.Refresh();
+            }
+        }
 
         private async Task Load()
         {
             Items.Clear();
-            foreach (var item in await _repository.Get())
+            var items = await _repository.Get();
+            foreach (var item in items)
                 Items.Add(item);
         }
 
         private void AddClick(object sender, RoutedEventArgs e)
             => Add();
+        private void RemoveClick(object sender, RoutedEventArgs e)
+            => RemoveCurrentItem();
+        private void RecoverClick(object sender, RoutedEventArgs e)
+            => RecoverCurrentItem();
         private void DeleteClick(object sender, RoutedEventArgs e)
             => DeleteCurrentItem();
         private void RefreshClick(object sender, RoutedEventArgs e)
@@ -75,10 +140,16 @@ namespace Notes
         private void ExportClick(object sender, RoutedEventArgs e)
             => Export();
 
+        private void CloseFilterClick(object sender, RoutedEventArgs e)
+            => ShowFilter.IsChecked = false;
+
+        private void OpenConfigurationClick(object sender, RoutedEventArgs e)
+            => new ConfigurationWindow(_repository) { Owner = this }.Show();
+
         private void SaveItemEvent(object sender, KeyboardFocusChangedEventArgs e)
             => SaveCurrentItem();
 
-        private async void Refresh()
+        public async void Refresh()
         {
             CurrentItem = null;
             await Load();
@@ -93,13 +164,13 @@ namespace Notes
         {
             if (CurrentItem == null) return;
 
-            if (CurrentItem.Id == 0 && (!string.IsNullOrEmpty(CurrentItem.Header) || !string.IsNullOrEmpty(CurrentItem.Body)))
+            if (CurrentItem.New && (!string.IsNullOrEmpty(CurrentItem.Header) || !string.IsNullOrEmpty(CurrentItem.Body)))
             {
                 _ = await _repository.Insert(CurrentItem);
                 CurrentItem.ApplyChanges();
                 Items.Add(CurrentItem);
             }
-            else if (CurrentItem.HasChanges)
+            else if (CurrentItem.HasChanges || CurrentItem.BodyProperties.HasChanges)
             {
                 _ = await _repository.Update(CurrentItem);
                 CurrentItem.ApplyChanges();
@@ -108,23 +179,58 @@ namespace Notes
             OnPropertyChanged(nameof(CurrentItem));
         }
 
+        private async Task RemoveCurrentItem()
+        {
+            if (CurrentItem == null) return;
+
+            if (CurrentItem.Id == 0)
+                CurrentItem = null;
+            else
+            {
+                if (CustomMessageBox.Show(
+                    this,
+                    $"Remove {CurrentItem.Header}?",
+                    "Warning",
+                    "\u0028",
+                    (SolidColorBrush)Application.Current.FindResource("WarningSolidBrush"),
+                    MessageBoxButton.YesNo
+                    ) == MessageBoxResult.Yes)
+                    _ = await _repository.Remove(CurrentItem);
+                else return;
+            }
+
+            await Load();
+        }
+
+        private async Task RecoverCurrentItem()
+        {
+            if (CurrentItem == null) return;
+
+            if (CurrentItem.Id == 0)
+                CurrentItem = null;
+            else
+                await _repository.Recover(CurrentItem);
+
+            await Load();
+        }
+
         private async Task DeleteCurrentItem()
         {
             if (CurrentItem == null) return;
 
-            if(CurrentItem.Id == 0)
+            if (CurrentItem.Id == 0)
                 CurrentItem = null;
             else
             {
-                if (MessageBox.Show(
+                if (CustomMessageBox.Show(
                     this,
                     $"Delete {CurrentItem.Header}?",
                     "Warning",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning,
-                    MessageBoxResult.No
+                    "\u0045",
+                    (SolidColorBrush)Application.Current.FindResource("ErrorSolidBrush"),
+                    MessageBoxButton.YesNo
                     ) == MessageBoxResult.Yes)
-                    _ = await _repository.Remove(CurrentItem);
+                    _ = await _repository.Delete(CurrentItem);
                 else return;
             }
 
@@ -149,7 +255,13 @@ namespace Notes
                     return;
                 await _repository.Import(newItems);
                 Refresh();
-                MessageBox.Show(this, "Import completed.", "Informing", MessageBoxButton.OK, MessageBoxImage.Information);
+                CustomMessageBox.Show(
+                    this,
+                    $"Import completed.",
+                    "Informing",
+                    "\u0027",
+                    (SolidColorBrush)Application.Current.FindResource("InformationSolidBrush"),
+                    MessageBoxButton.OK);
             }
         }
 
@@ -166,7 +278,13 @@ namespace Notes
             {
                 var content = JsonSerializer.Serialize(Items.ToArray());
                 await File.WriteAllTextAsync(saveFileDialog.FileName, content);
-                MessageBox.Show(this, "Export completed.", "Informing", MessageBoxButton.OK, MessageBoxImage.Information);
+                CustomMessageBox.Show(
+                    this,
+                    $"Export completed.",
+                    "Informing",
+                    "\u0030",
+                    (SolidColorBrush)Application.Current.FindResource("InformationSolidBrush"),
+                    MessageBoxButton.OK);
             }
         }
 
@@ -187,15 +305,19 @@ namespace Notes
                 if (memo == null)
                     return false;
 
-                if (string.IsNullOrEmpty(FilterText)
-                    || DeepContains(memo.Header, FilterText)
-                    || memo.Body.Contains(FilterText, StringComparison.OrdinalIgnoreCase))
+                if ((string.IsNullOrEmpty(FilterText)
+                    || (SearchMode != SearchMode.Contents && DeepContains(memo.Header, FilterText))
+                    || (SearchMode != SearchMode.Headers && memo.Body.Contains(FilterText, StringComparison.OrdinalIgnoreCase)))
+                 && (RemoveOption == RemoveOption.All
+                    || (RemoveOption == RemoveOption.WithoutRemoved && memo.Removed == false)
+                    || (RemoveOption == RemoveOption.OnlyRemoved && memo.Removed == true)))
                     return true;
 
                 return false;
             };
 
             collectionView.SortDescriptions.Clear();
+            collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.Favorite), ListSortDirection.Descending));
             collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.InsertedDate), ListSortDirection.Descending));
 
             MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
@@ -264,6 +386,41 @@ namespace Notes
             }
 
             return result.ToString();
+        }
+
+        private void CreatedDateChangeMode(object sender, MouseButtonEventArgs e)
+        {
+            FullCreatedDate = !FullCreatedDate;
+            if(FullCreatedDate)
+            {
+                var binding = ShortInsertedDateTextBlock.GetBindingExpression(VisibilityProperty);
+                Binding bindingCopy = new Binding(binding.ParentBinding.Path.Path);
+                bindingCopy.Converter = binding.ParentBinding.Converter;
+                bindingCopy.ConverterParameter = binding.ParentBinding.ConverterParameter;
+                bindingCopy.Mode = binding.ParentBinding.Mode;
+                FullInsertedDateTextBlock.SetBinding(VisibilityProperty, bindingCopy);
+            }
+            else
+            {
+                FullInsertedDateTextBlock.Visibility = Visibility.Collapsed;
+            }
+        }
+        private void UpdateDateChangeMode(object sender, MouseButtonEventArgs e)
+        {
+            FullUpdatedDate = !FullUpdatedDate;
+            if (FullUpdatedDate)
+            {
+                var binding = ShortUpdatedDateTextBlock.GetBindingExpression(VisibilityProperty);
+                Binding bindingCopy = new Binding(binding.ParentBinding.Path.Path);
+                bindingCopy.Converter = binding.ParentBinding.Converter;
+                bindingCopy.ConverterParameter = binding.ParentBinding.ConverterParameter;
+                bindingCopy.Mode = binding.ParentBinding.Mode;
+                FullUpdatedDateTextBlock.SetBinding(VisibilityProperty, bindingCopy);
+            }
+            else
+            {
+                FullUpdatedDateTextBlock.Visibility = Visibility.Collapsed;
+            }
         }
     }
 
