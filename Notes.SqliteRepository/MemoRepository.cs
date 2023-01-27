@@ -16,19 +16,9 @@ namespace Notes.SqliteRepository
 
         public override async Task<IEnumerable<Memo>> Get()
         {
-            return await Get(RemoveOption.All);
+            return await _dataContext.Memos.ToArrayAsync();
         }
-        public async Task<IEnumerable<Memo>> Get(RemoveOption removeOption)
-        {
-            var items = await _dataContext.Memos.ToArrayAsync();
 
-            return items.Where(m => removeOption switch
-            {
-                RemoveOption.All => true,
-                RemoveOption.OnlyRemoved => m.Removed == true,
-                _ => m.Removed == false
-            });
-        }
         public override async Task<Memo> Get(int id)
         {
             return await _dataContext.Memos

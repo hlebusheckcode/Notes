@@ -73,7 +73,7 @@ namespace Notes
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                var content = JsonSerializer.Serialize((await _repository.Get(RemoveOption.All)).ToArray());
+                var content = JsonSerializer.Serialize((await _repository.Get()).ToArray());
                 await File.WriteAllTextAsync(saveFileDialog.FileName, content);
                 CustomMessageBox.Show(
                     this,
