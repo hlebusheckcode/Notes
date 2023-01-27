@@ -16,9 +16,17 @@ using System.IO;
 using System.Text.Json;
 using Notes.Wpf.Controls;
 using System.Windows.Media;
+using System.Configuration;
 
 namespace Notes
 {
+    public enum RemoveOption
+    {
+        WithoutRemoved = 0,
+        All = 1,
+        OnlyRemoved = 2
+    }
+
     public enum SearchMode
     {
         All,
@@ -26,19 +34,40 @@ namespace Notes
         Contents
     }
 
+    public enum SortBy
+    {
+        Created,
+        Updated,
+        Header
+    }
+
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private IMemoRepository _repository;
         private Memo? _currentItem;
         private string _filterText = string.Empty;
-        private RemoveOption _removeOption = RemoveOption.WithoutRemoved;
+        private RemoveOption _removeOption;
         private bool _fullCreatedDate = false;
         private bool _fullUpdatedDate = false;
-        private SearchMode _searchMode = SearchMode.All;
+        private SearchMode _searchMode;
+        private SortBy _sortBy;
+        private ListSortDirection _sortDirection;
 
         public MainWindow(IMemoRepository repository)
         {
+            var config = Wpf.Properties.Settings.Default.FilterConfig;
+            if (config == null)
+            {
+                config = Wpf.Properties.Settings.Default.FilterConfig = new FilterConfig();
+                Wpf.Properties.Settings.Default.Save();
+            }
+            _sortBy = config.SortBy;
+            _sortDirection = config.SortDirection;
+            _searchMode = config.SearchMode;
+            _removeOption = config.RemoveOption;
+
             InitializeComponent();
+
             SaveCommand = new RelayCommand(async (_) => await SaveCurrentItem(), (_) => CurrentItem != null);
             DataContext = this;
             _repository = repository;
@@ -63,8 +92,7 @@ namespace Notes
             {
                 _filterText = value;
                 OnPropertyChanged(nameof(FilterText));
-                var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
-                collectionView.Refresh();
+                RefreshCollectionView();
             }
         }
 
@@ -75,8 +103,7 @@ namespace Notes
             set
             {
                 _removeOption = value;
-                var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
-                collectionView.Refresh();
+                RefreshCollectionView();
             }
         }
 
@@ -111,8 +138,27 @@ namespace Notes
             set
             {
                 _searchMode = value;
-                var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
-                collectionView.Refresh();
+                RefreshCollectionView();
+            }
+        }
+
+        public SortBy SortBy
+        {
+            get => _sortBy;
+            set
+            {
+                _sortBy = value;
+                UpdateSort();
+            }
+        }
+
+        public ListSortDirection SortDirection
+        {
+            get => _sortDirection;
+            set
+            {
+                _sortDirection = value;
+                UpdateSort();
             }
         }
 
@@ -134,6 +180,8 @@ namespace Notes
             => DeleteCurrentItem();
         private void RefreshClick(object sender, RoutedEventArgs e)
             => Refresh();
+        private void RefreshViewClick(object sender, RoutedEventArgs e)
+            => RefreshCollectionView();
 
         private void ImportClick(object sender, RoutedEventArgs e)
             => Import();
@@ -316,11 +364,33 @@ namespace Notes
                 return false;
             };
 
-            collectionView.SortDescriptions.Clear();
-            collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.Favorite), ListSortDirection.Descending));
-            collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.InsertedDate), ListSortDirection.Descending));
+            UpdateSort();
 
             MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+        }
+
+        private void UpdateSort()
+            => UpdateSort(true);
+        private void UpdateSort(bool refreshView)
+        {
+            var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
+            collectionView.SortDescriptions.Clear();
+            collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.Favorite), ListSortDirection.Descending));
+            collectionView.SortDescriptions.Add(new SortDescription(SortBy switch
+            {
+                SortBy.Created => nameof(Memo.InsertedDate),
+                SortBy.Updated => nameof(Memo.UpdatedDate),
+                SortBy.Header => nameof(Memo.Header)
+            }, SortDirection));
+
+            if (refreshView)
+                RefreshCollectionView();
+        }
+
+        private void RefreshCollectionView()
+        {
+            var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
+            collectionView.Refresh();
         }
 
         private void ClearFilter(object sender, RoutedEventArgs e)
@@ -422,6 +492,26 @@ namespace Notes
                 FullUpdatedDateTextBlock.Visibility = Visibility.Collapsed;
             }
         }
+
+        private void WindowClosing(object sender, CancelEventArgs e)
+        {
+            var config = new FilterConfig();
+            config.SortBy = SortBy;
+            config.SortDirection = SortDirection;
+            config.SearchMode = SearchMode;
+            config.RemoveOption = RemoveOption;
+            Wpf.Properties.Settings.Default.FilterConfig = config;
+            Wpf.Properties.Settings.Default.Save();
+        }
+    }
+
+    [SettingsSerializeAs(SettingsSerializeAs.Xml)]
+    public class FilterConfig
+    {
+        public SortBy SortBy { get; set; } = SortBy.Created;
+        public ListSortDirection SortDirection { get; set; } = ListSortDirection.Descending;
+        public SearchMode SearchMode { get; set; } = SearchMode.All;
+        public RemoveOption RemoveOption { get; set; } = RemoveOption.WithoutRemoved;
     }
 
     class BijectiveDictionary<T> : Dictionary<T, T>
