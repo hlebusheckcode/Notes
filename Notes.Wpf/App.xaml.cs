@@ -1,19 +1,20 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Notes.Repository;
 using Notes.SqliteRepository;
+using System;
 using System.Windows;
 
 namespace Notes
 {
     public partial class App : Application
     {
-        private ServiceProvider serviceProvider;
+        public static ServiceProvider ServiceProvider = null!;
 
         public App()
         {
             ServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
-            serviceProvider = services.BuildServiceProvider();
+            ServiceProvider = services.BuildServiceProvider();
         }
 
         private void ConfigureServices(ServiceCollection services)
@@ -25,8 +26,10 @@ namespace Notes
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            var mainWindow = serviceProvider.GetService<MainWindow>();
-            mainWindow?.Show();
+            var mainWindow = ServiceProvider.GetService<MainWindow>();
+            if (mainWindow == null)
+                throw new Exception("Everything is broken.");
+            mainWindow.Show();
         }
     }
 }

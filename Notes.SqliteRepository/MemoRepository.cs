@@ -1,4 +1,4 @@
-﻿using Baza.Repositories;
+﻿using Baza.Repository;
 using Microsoft.EntityFrameworkCore;
 using Notes.Model;
 using Notes.Repository;
@@ -16,10 +16,9 @@ namespace Notes.SqliteRepository
 
         public override async Task<IEnumerable<Memo>> Get()
         {
-            return await _dataContext.Memos
-                .Where(m => m.RemovedDate == null)
-                .ToArrayAsync();
+            return await _dataContext.Memos.ToArrayAsync();
         }
+
         public override async Task<Memo> Get(int id)
         {
             return await _dataContext.Memos
@@ -77,12 +76,10 @@ namespace Notes.SqliteRepository
 
         public async Task Import(IEnumerable<Memo> items)
         {
-            _dataContext.AutoSetInsertedDate = false;
-            _dataContext.AutoSetUpdatedDate = false;
+            _dataContext.AutoSetInsertedDate = _dataContext.AutoSetUpdatedDate = false;
             await _dataContext.Memos.AddRangeAsync(items);
             await _dataContext.SaveChangesAsync();
-            _dataContext.AutoSetInsertedDate = true;
-            _dataContext.AutoSetUpdatedDate = true;
+            _dataContext.AutoSetInsertedDate = _dataContext.AutoSetUpdatedDate = true;
         }
     }
 }
