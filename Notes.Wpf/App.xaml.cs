@@ -26,9 +26,8 @@ namespace Notes
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            var mainWindow = ServiceProvider.GetService<MainWindow>();
-            if (mainWindow == null)
-                throw new Exception("Everything is broken.");
+            var mainWindow = ServiceProvider.GetService<MainWindow>()
+                ?? throw new Exception("Everything is broken.");
             mainWindow.Show();
         }
     }

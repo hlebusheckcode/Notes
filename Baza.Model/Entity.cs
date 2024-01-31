@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace Baza.Model
@@ -59,9 +60,9 @@ namespace Baza.Model
 
         #region Protected methods
 
-        protected virtual bool SetValue<T>(ref T property, T value, string propertyName)
-            => SetValue(ref property, value, propertyName, null);
-        protected virtual bool SetValue<T>(ref T property, T value, string propertyName, Action<T>? action)
+        protected virtual bool SetValue<T>(ref T property, T value, [CallerMemberName] string propertyName = null!)
+            => SetValue(ref property, value, null, propertyName);
+        protected virtual bool SetValue<T>(ref T property, T value, Action<T>? action, [CallerMemberName] string propertyName = null!)
         {
             if (Equals(property, value))
                 return false;

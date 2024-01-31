@@ -844,7 +844,7 @@
         <Setter Property="FontSize" Value="{StaticResource MediumFontSize}"/>
         <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
         <Setter Property="Foreground" Value="{StaticResource ForegroundPrimarySolidBrush}"/>
-        <Setter Property="Background" Value="{StaticResource PrimarySolidBrush1}"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="{StaticResource PrimarySolidBrush4}"/>
         <Setter Property="SnapsToDevicePixels" Value="True" />

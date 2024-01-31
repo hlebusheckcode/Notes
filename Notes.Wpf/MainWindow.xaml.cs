@@ -71,7 +71,7 @@ namespace Notes
             SaveCommand = new RelayCommand(async (_) => await SaveCurrentItem(), (_) => CurrentItem != null);
             DataContext = this;
             _repository = repository;
-            Load();
+            Load().Wait();
         }
 
         public ObservableCollection<Memo> Items { get; } = new ObservableCollection<Memo>();
