@@ -73,6 +73,12 @@ namespace Notes.Model
         public override object? GetIdentifier() => Id;
         public override void SetIdentifier(object identifier) => Id = Convert.ToInt32(identifier);
 
+        public override void ApplyChanges()
+        {
+            base.ApplyChanges();
+            BodyProperties.ApplyChanges();
+        }
+
         public override string ToString() => Header;
 
         #endregion Public properties

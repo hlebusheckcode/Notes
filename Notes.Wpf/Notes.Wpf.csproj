@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+		<TargetFramework>net7.0-windows10.0.18362.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<ApplicationIcon>notes.ico</ApplicationIcon>
@@ -10,7 +10,6 @@
 		<Version>1.0.0</Version>
 		<ProductVersion>$(VersionPrefix)</ProductVersion>
 		<FileVersion>$(Version)</FileVersion>
-		<SignAssembly>False</SignAssembly>
 	</PropertyGroup>
 
 	<ItemGroup>

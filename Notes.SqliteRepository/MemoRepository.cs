@@ -54,6 +54,20 @@ namespace Notes.SqliteRepository
             return item;
         }
 
+        public async Task<Memo> Update(int id, Memo item, bool changeUpdatedDate)
+        {
+            item.Id = id;
+            return await Update(item, changeUpdatedDate);
+        }
+        public async Task<Memo> Update(Memo item, bool changeUpdatedDate)
+        {
+            var temp = _dataContext.AutoSetUpdatedDate;
+            _dataContext.AutoSetUpdatedDate = changeUpdatedDate;
+            await Update(item);
+            _dataContext.AutoSetUpdatedDate = temp;
+            return item;
+        }
+
         public async Task<Memo> Remove(int id)
             => await Remove(await Get(id));
         public async Task<Memo> Remove(Memo item)

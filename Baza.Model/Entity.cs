@@ -44,7 +44,7 @@ namespace Baza.Model
         public virtual void SetIdentifier(object identifier)
             => throw new NotImplementedException();
 
-        public void ApplyChanges()
+        public virtual void ApplyChanges()
             => _oldProperties = null;
         public void RollbackChanges()
         {
@@ -60,10 +60,13 @@ namespace Baza.Model
 
         #region Protected methods
 
-        protected virtual bool SetValue<T>(ref T property, T value, [CallerMemberName] string propertyName = null!)
+        protected virtual bool SetValue<T>(ref T property, T value, [CallerMemberName] string? propertyName = null)
             => SetValue(ref property, value, null, propertyName);
-        protected virtual bool SetValue<T>(ref T property, T value, Action<T>? action, [CallerMemberName] string propertyName = null!)
+        protected virtual bool SetValue<T>(ref T property, T value, Action<T>? action, [CallerMemberName] string? propertyName = null)
         {
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+
             if (Equals(property, value))
                 return false;
 

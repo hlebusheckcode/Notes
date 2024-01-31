@@ -192,7 +192,11 @@ namespace Notes
             => ShowFilter.IsChecked = false;
 
         private void OpenConfigurationClick(object sender, RoutedEventArgs e)
-            => new ConfigurationWindow(_repository) { Owner = this }.Show();
+        {
+            if (App.ConfigurationOpen) return;
+            App.ConfigurationOpen = true;
+            new ConfigurationWindow(_repository) { Owner = this }.Show();
+        }
 
         private void SaveItemEvent(object sender, KeyboardFocusChangedEventArgs e)
             => SaveCurrentItem();
@@ -205,7 +209,12 @@ namespace Notes
 
         private void Add()
         {
-            CurrentItem = new Memo();
+            CurrentItem = new Memo { Header = FilterText };
+            if (string.IsNullOrEmpty(FilterText))
+                Header.Focus();
+            else
+                BodyTextBox.Focus();
+            FilterText = string.Empty;
         }
 
         private async Task SaveCurrentItem()
@@ -218,10 +227,15 @@ namespace Notes
                 CurrentItem.ApplyChanges();
                 Items.Add(CurrentItem);
             }
-            else if (CurrentItem.HasChanges || CurrentItem.BodyProperties.HasChanges)
+            else if (CurrentItem.HasChanges)
             {
                 _ = await _repository.Update(CurrentItem);
                 CurrentItem.ApplyChanges();
+            }
+            else if (CurrentItem.BodyProperties.HasChanges)
+            {
+                _ = await _repository.Update(CurrentItem, false);
+                CurrentItem.BodyProperties.ApplyChanges();
             }
 
             OnPropertyChanged(nameof(CurrentItem));
@@ -405,8 +419,10 @@ namespace Notes
             return false;
         }
 
-        private readonly BijectiveDictionary<char> _dictionary = new()
+        private readonly Dictionary<char, char> _dictionary = new()
         {
+            { '`', 'ё' },
+            { '~', 'ё' },
             { 'q', 'й' },
             { 'w', 'ц' },
             { 'e', 'у' },
@@ -418,7 +434,9 @@ namespace Notes
             { 'o', 'щ' },
             { 'p', 'з' },
             { '[', 'х' },
+            { '{', 'х' },
             { ']', 'ъ' },
+            { '}', 'ъ' },
             { 'a', 'ф' },
             { 's', 'ы' },
             { 'd', 'в' },
@@ -429,7 +447,9 @@ namespace Notes
             { 'k', 'л' },
             { 'l', 'д' },
             { ';', 'ж' },
+            { ':', 'ж' },
             { '\'', 'э' },
+            { '\"', 'э' },
             { 'z', 'я' },
             { 'x', 'ч' },
             { 'c', 'с' },
@@ -438,7 +458,35 @@ namespace Notes
             { 'n', 'т' },
             { 'm', 'ь' },
             { ',', 'б' },
-            { '.', 'ю' }
+            { '<', 'б' },
+            { '.', 'ю' },
+            { '>', 'ю' },
+            { 'й', 'q' },
+            { 'ц', 'w' },
+            { 'у', 'e' },
+            { 'к', 'r' },
+            { 'е', 't' },
+            { 'н', 'y' },
+            { 'г', 'u' },
+            { 'ш', 'i' },
+            { 'щ', 'o' },
+            { 'з', 'p' },
+            { 'ф', 'a' },
+            { 'ы', 's' },
+            { 'в', 'd' },
+            { 'а', 'f' },
+            { 'п', 'g' },
+            { 'р', 'h' },
+            { 'о', 'j' },
+            { 'л', 'k' },
+            { 'д', 'l' },
+            { 'я', 'z' },
+            { 'ч', 'x' },
+            { 'с', 'c' },
+            { 'м', 'v' },
+            { 'и', 'b' },
+            { 'т', 'n' },
+            { 'ь', 'm' }
         };
         private string Translate(string input)
         {
@@ -512,21 +560,5 @@ namespace Notes
         public ListSortDirection SortDirection { get; set; } = ListSortDirection.Descending;
         public SearchMode SearchMode { get; set; } = SearchMode.All;
         public RemoveOption RemoveOption { get; set; } = RemoveOption.WithoutRemoved;
-    }
-
-    class BijectiveDictionary<T> : Dictionary<T, T>
-        where T : notnull
-    {
-        public new T this[T index]
-        {
-            get
-            {
-                if (ContainsKey(index))
-                    return base[index];
-                if (ContainsValue(index))
-                    return this.FirstOrDefault(x => index.Equals(x.Value)).Key;
-                throw new KeyNotFoundException("index");
-            }
-        }
     }
 }

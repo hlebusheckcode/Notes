@@ -93,5 +93,10 @@ namespace Notes
             maxButton.Visibility = Visibility.Collapsed;
             ResizeMode = ResizeMode.NoResize;
         }
+
+        private void ClosedWindow(object sender, EventArgs e)
+        {
+            App.ConfigurationOpen = false;
+        }
     }
 }

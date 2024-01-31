@@ -33,29 +33,23 @@ namespace Notes.SqliteRepository
             if (AutoSetInsertedDate)
             {
                 var insertedEntries = ChangeTracker.Entries()
-                                   .Where(x => x.State == EntityState.Added)
-                                   .Select(x => x.Entity);
+                    .Where(x => x.State == EntityState.Added)
+                    .Select(x => x.Entity);
 
                 foreach (var insertedEntry in insertedEntries)
-                {
-                    var auditableEntity = insertedEntry as IAuditableEntity;
-                    if (auditableEntity != null)
-                        auditableEntity.InsertedDate = DateTime.Now;
-                }
+                    if (insertedEntry is IAuditableEntity auditableEntity)
+                        auditableEntity.UpdatedDate = auditableEntity.InsertedDate = DateTime.Now;
             }
 
             if (AutoSetUpdatedDate)
             {
                 var modifiedEntries = ChangeTracker.Entries()
-                       .Where(x => x.State == EntityState.Modified)
-                       .Select(x => x.Entity);
+                    .Where(x => x.State == EntityState.Modified)
+                    .Select(x => x.Entity);
 
                 foreach (var modifiedEntry in modifiedEntries)
-                {
-                    var auditableEntity = modifiedEntry as IAuditableEntity;
-                    if (auditableEntity != null)
+                    if (modifiedEntry is IAuditableEntity auditableEntity)
                         auditableEntity.UpdatedDate = DateTime.Now;
-                }
             }
 
             return base.SaveChangesAsync(cancellationToken);
