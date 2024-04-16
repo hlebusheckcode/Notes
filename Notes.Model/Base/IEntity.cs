@@ -1,4 +1,4 @@
-﻿namespace Baza.Model
+﻿namespace Notes.Model.Base
 {
     public interface IEntity
     {

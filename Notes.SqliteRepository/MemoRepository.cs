@@ -1,99 +1,67 @@
-﻿using Baza.Repository;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Notes.Model;
 using Notes.Repository;
 
 namespace Notes.SqliteRepository
 {
-    public class MemoRepository : Repository<Memo>, IMemoRepository
+    public class MemoRepository(DataContext dataContext) : IMemoRepository
     {
-        protected DataContext _dataContext;
+        private readonly DataContext _dataContext = dataContext;
 
-        public MemoRepository(DataContext dataContext)
-        {
-            _dataContext = dataContext;
-        }
+        public async Task<IEnumerable<Memo>> Get() =>
+            await _dataContext.Memos.ToArrayAsync();
 
-        public override async Task<IEnumerable<Memo>> Get()
-        {
-            return await _dataContext.Memos.ToArrayAsync();
-        }
-
-        public override async Task<Memo> Get(int id)
-        {
-            return await _dataContext.Memos
+        public async Task<Memo> Get(uint id) =>
+            await _dataContext.Memos
                 .Where(m => m.Id == id)
                 .FirstAsync();
+
+        public async Task<Memo> Insert(Memo item)
+        {
+            item.InsertedDate = DateTime.Now;
+            item.UpdatedDate = DateTime.Now;
+            var entry = await _dataContext.Memos.AddAsync(item);
+            _ = await _dataContext.SaveChangesAsync();
+            return entry.Entity;
         }
 
-        public override async Task<Memo> Insert(Memo item)
+        public async Task<Memo> Update(Memo item)
         {
-            await _dataContext.Memos.AddAsync(item);
-            await _dataContext.SaveChangesAsync();
-            return item;
+            if (item.HasChanges)
+                item.UpdatedDate = DateTime.Now;
+            var entry = _dataContext.Memos.Update(item);
+            _ = await _dataContext.SaveChangesAsync();
+            return entry.Entity;
         }
 
-        public override async Task<Memo> Update(int id, Memo item)
-        {
-            item.Id = id;
-            return await Update(item);
-        }
-        public override async Task<Memo> Update(Memo item)
-        {
-            _dataContext.Memos.Update(item);
-            await _dataContext.SaveChangesAsync();
-            return item;
-        }
-
-        public override async Task<Memo> Delete(int id)
-            => await Delete(await Get(id));
-        public override async Task<Memo> Delete(Memo item)
-        {
-            _dataContext.Remove(item);
-            await _dataContext.SaveChangesAsync();
-            return item;
-        }
-
-        public async Task<Memo> Update(int id, Memo item, bool changeUpdatedDate)
-        {
-            item.Id = id;
-            return await Update(item, changeUpdatedDate);
-        }
-        public async Task<Memo> Update(Memo item, bool changeUpdatedDate)
-        {
-            var temp = _dataContext.AutoSetUpdatedDate;
-            _dataContext.AutoSetUpdatedDate = changeUpdatedDate;
-            await Update(item);
-            _dataContext.AutoSetUpdatedDate = temp;
-            return item;
-        }
-
-        public async Task<Memo> Remove(int id)
-            => await Remove(await Get(id));
         public async Task<Memo> Remove(Memo item)
         {
+            item.UpdatedDate = DateTime.Now;
             item.RemovedDate = DateTime.Now;
-            _dataContext.Memos.Update(item);
-            await _dataContext.SaveChangesAsync();
-            return item;
+            var entry = _dataContext.Memos.Update(item);
+            _ = await _dataContext.SaveChangesAsync();
+            return entry.Entity;
         }
-
-        public async Task<Memo> Recover(int id)
-            => await Recover(await Get(id));
         public async Task<Memo> Recover(Memo item)
         {
+            item.UpdatedDate = DateTime.Now;
             item.RemovedDate = null;
-            _dataContext.Memos.Update(item);
-            await _dataContext.SaveChangesAsync();
-            return item;
+            var entry = _dataContext.Memos.Update(item);
+            _ = await _dataContext.SaveChangesAsync();
+            return entry.Entity;
+        }
+
+        public async Task<Memo> Delete(Memo item)
+        {
+            var entry = _dataContext.Memos.Remove(item);
+            _ = await _dataContext.SaveChangesAsync();
+            return entry.Entity;
         }
 
         public async Task Import(IEnumerable<Memo> items)
         {
-            _dataContext.AutoSetInsertedDate = _dataContext.AutoSetUpdatedDate = false;
             await _dataContext.Memos.AddRangeAsync(items);
-            await _dataContext.SaveChangesAsync();
-            _dataContext.AutoSetInsertedDate = _dataContext.AutoSetUpdatedDate = true;
+            _ = await _dataContext.SaveChangesAsync();
         }
     }
 }

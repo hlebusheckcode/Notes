@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
-namespace Baza.Model
+namespace Notes.Model.Base
 {
     public class NotifyEntity : Entity, INotifyEntity
     {

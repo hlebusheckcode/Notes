@@ -1,14 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Baza.Repository\Baza.Repository.csproj" />
-    <ProjectReference Include="..\Baza.ViewModel\Baza.ViewModel.csproj" />
     <ProjectReference Include="..\Notes.Model\Notes.Model.csproj" />
     <ProjectReference Include="..\Notes.Repository\Notes.Repository.csproj" />
     <ProjectReference Include="..\Notes.SqliteRepository\Notes.SqliteRepository.csproj" />

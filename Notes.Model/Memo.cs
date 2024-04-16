@@ -1,20 +1,19 @@
-﻿using Baza.Model;
+﻿using Notes.Model.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Notes.Model
 {
-    public class Memo : Entity, IAuditableEntity
+    public class Memo : Entity
     {
         #region Private variables
 
-        private int _id;
+        private uint _id;
         private string _header = string.Empty;
         private string _body = string.Empty;
-        private bool _favorite = false;
         private DateTime _insertedDate;
-        private DateTime? _updatedDate;
+        private DateTime _updatedDate;
         private DateTime? _removedDate;
 
         #endregion Private variables
@@ -22,40 +21,36 @@ namespace Notes.Model
         #region Public properties
 
         [Key, JsonIgnore]
-        public int Id
+        public uint Id
         {
             get => _id;
-            set => SetValue(ref _id, value, nameof(Id));
+            set => SetValue(ref _id, value);
         }
 
         public string Header
         {
             get => _header;
-            set => SetValue(ref _header, value, nameof(Header));
+            set => SetValue(ref _header, value);
         }
         public string Body
         {
             get => _body;
-            set => SetValue(ref _body, value, nameof(Body));
-        }
-        public bool Favorite
-        {
-            get => _favorite;
-            set => SetValue(ref _favorite, value, nameof(Favorite));
+            set => SetValue(ref _body, value);
         }
 
-        public TextProperties BodyProperties { get; set; } = new();
+        public MemoOptions Options { get; set; } = new();
 
         [Required]
         public DateTime InsertedDate
         {
             get => _insertedDate;
-            set => SetValue(ref _insertedDate, value, nameof(InsertedDate));
+            set => SetValue(ref _insertedDate, value);
         }
-        public DateTime? UpdatedDate
+        [Required]
+        public DateTime UpdatedDate
         {
             get => _updatedDate;
-            set => SetValue(ref _updatedDate, value, nameof(UpdatedDate));
+            set => SetValue(ref _updatedDate, value);
         }
         public DateTime? RemovedDate
         {
@@ -71,12 +66,12 @@ namespace Notes.Model
         #region Public methods
 
         public override object? GetIdentifier() => Id;
-        public override void SetIdentifier(object identifier) => Id = Convert.ToInt32(identifier);
+        public override void SetIdentifier(object identifier) => Id = Convert.ToUInt32(identifier);
 
         public override void ApplyChanges()
         {
+            Options.ApplyChanges();
             base.ApplyChanges();
-            BodyProperties.ApplyChanges();
         }
 
         public override string ToString() => Header;

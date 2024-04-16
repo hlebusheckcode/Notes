@@ -110,7 +110,7 @@
                                        FontFamily="{StaticResource Icons}" Text="&#x35;"/>
                         </Grid>
                         <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding Favorite}" Value="True">
+                            <DataTrigger Binding="{Binding Options.Favorite}" Value="True">
                                 <Setter TargetName="FavoriteIcon" Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Removed}" Value="True">
@@ -144,21 +144,21 @@
 
             <CheckBox Grid.Row="1" Grid.Column="1" Style="{StaticResource IconCheckBox}"
                       Click="RefreshViewClick"
-                      IsChecked="{Binding CurrentItem.Favorite, UpdateSourceTrigger=PropertyChanged}"
+                      IsChecked="{Binding CurrentItem.Options.Favorite, UpdateSourceTrigger=PropertyChanged}"
                       Content="&#x35;" HorizontalAlignment="Left" Margin="5 0 0 5"
                       LostKeyboardFocus="SaveItemEvent"
                       ToolTip="Favorite"
                       helpers:CheckBoxHelper.CheckedContent="&#x33;"
                       Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
             <CheckBox Grid.Row="1" Grid.Column="2" Style="{StaticResource IconCheckBox}"
-                      IsChecked="{Binding CurrentItem.BodyProperties.Wrapping, UpdateSourceTrigger=PropertyChanged}"
+                      IsChecked="{Binding CurrentItem.Options.Wrapping, UpdateSourceTrigger=PropertyChanged}"
                       Content="&#x31;" HorizontalAlignment="Left" Margin="5 0 0 5"
                       LostKeyboardFocus="SaveItemEvent"
                       ToolTip="Text wrap"
                       helpers:CheckBoxHelper.CheckedContent="&#x33;"
                       Visibility="{Binding CurrentItem, Converter={x:Static converters:NullToVisibilityConverter.Instance}, ConverterParameter=hidden}"/>
             <CheckBox Grid.Row="1" Grid.Column="3" Style="{StaticResource IconCheckBox}"
-                      IsChecked="{Binding CurrentItem.BodyProperties.ReadOnly, UpdateSourceTrigger=PropertyChanged}"
+                      IsChecked="{Binding CurrentItem.Options.ReadOnly, UpdateSourceTrigger=PropertyChanged}"
                       Content="&#x33;" HorizontalAlignment="Right" Margin="5 0 5 5"
                       LostKeyboardFocus="SaveItemEvent"
                       ToolTip="Lock"
@@ -168,8 +168,8 @@
             <TextBox x:Name="BodyTextBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" TabIndex="3"
                      Style="{DynamicResource SearchTextBox}" Margin="5 0 5 5" AcceptsReturn="True" AcceptsTab="True"
                      Text="{Binding CurrentItem.Body, UpdateSourceTrigger=PropertyChanged}"
-                     TextWrapping="{Binding CurrentItem.BodyProperties.Wrapping, Mode=OneWay, Converter={x:Static converters:BoolToTextWrappingConverter.Instance}}"
-                     IsReadOnly="{Binding CurrentItem.BodyProperties.ReadOnly, Mode=OneWay}"
+                     TextWrapping="{Binding CurrentItem.Options.Wrapping, Mode=OneWay, Converter={x:Static converters:BoolToTextWrappingConverter.Instance}}"
+                     IsReadOnly="{Binding CurrentItem.Options.ReadOnly, Mode=OneWay}"
                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                      LostKeyboardFocus="SaveItemEvent"
                      helpers:TextBoxHelper.Watermark="Content"

@@ -17,8 +17,6 @@ namespace Notes
             ServiceProvider = services.BuildServiceProvider();
         }
 
-        public static bool ConfigurationOpen { get; set; } = false;
-
         private void ConfigureServices(ServiceCollection services)
         {
             services.AddDbContext<DataContext>();

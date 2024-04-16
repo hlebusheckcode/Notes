@@ -52,6 +52,7 @@ namespace Notes
         private SearchMode _searchMode;
         private SortBy _sortBy;
         private ListSortDirection _sortDirection;
+        private ConfigurationWindow? _configurationWindow;
 
         public MainWindow(IMemoRepository repository)
         {
@@ -71,7 +72,7 @@ namespace Notes
             SaveCommand = new RelayCommand(async (_) => await SaveCurrentItem(), (_) => CurrentItem != null);
             DataContext = this;
             _repository = repository;
-            Load().Wait();
+            Load();
         }
 
         public ObservableCollection<Memo> Items { get; } = new ObservableCollection<Memo>();
@@ -172,34 +173,30 @@ namespace Notes
 
         private void AddClick(object sender, RoutedEventArgs e)
             => Add();
-        private void RemoveClick(object sender, RoutedEventArgs e)
-            => RemoveCurrentItem();
-        private void RecoverClick(object sender, RoutedEventArgs e)
-            => RecoverCurrentItem();
-        private void DeleteClick(object sender, RoutedEventArgs e)
-            => DeleteCurrentItem();
+        private async void RemoveClick(object sender, RoutedEventArgs e)
+            => await RemoveCurrentItem();
+        private async void RecoverClick(object sender, RoutedEventArgs e)
+            => await RecoverCurrentItem();
+        private async void DeleteClick(object sender, RoutedEventArgs e)
+            => await DeleteCurrentItem();
         private void RefreshClick(object sender, RoutedEventArgs e)
             => Refresh();
         private void RefreshViewClick(object sender, RoutedEventArgs e)
             => RefreshCollectionView();
-
-        private void ImportClick(object sender, RoutedEventArgs e)
-            => Import();
-        private void ExportClick(object sender, RoutedEventArgs e)
-            => Export();
 
         private void CloseFilterClick(object sender, RoutedEventArgs e)
             => ShowFilter.IsChecked = false;
 
         private void OpenConfigurationClick(object sender, RoutedEventArgs e)
         {
-            if (App.ConfigurationOpen) return;
-            App.ConfigurationOpen = true;
-            new ConfigurationWindow(_repository) { Owner = this }.Show();
+            _configurationWindow ??= new ConfigurationWindow(_repository) { Owner = this };
+            _configurationWindow.Closed += (_, _) => _configurationWindow = null;
+            _configurationWindow.Show();
+            _configurationWindow.Focus();
         }
 
-        private void SaveItemEvent(object sender, KeyboardFocusChangedEventArgs e)
-            => SaveCurrentItem();
+        private async void SaveItemEvent(object sender, KeyboardFocusChangedEventArgs e)
+            => await SaveCurrentItem();
 
         public async void Refresh()
         {
@@ -227,15 +224,10 @@ namespace Notes
                 CurrentItem.ApplyChanges();
                 Items.Add(CurrentItem);
             }
-            else if (CurrentItem.HasChanges)
+            else if (CurrentItem.HasChanges || CurrentItem.Options.HasChanges)
             {
                 _ = await _repository.Update(CurrentItem);
                 CurrentItem.ApplyChanges();
-            }
-            else if (CurrentItem.BodyProperties.HasChanges)
-            {
-                _ = await _repository.Update(CurrentItem, false);
-                CurrentItem.BodyProperties.ApplyChanges();
             }
 
             OnPropertyChanged(nameof(CurrentItem));
@@ -389,12 +381,13 @@ namespace Notes
         {
             var collectionView = CollectionViewSource.GetDefaultView(MemoList.ItemsSource);
             collectionView.SortDescriptions.Clear();
-            collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.Favorite), ListSortDirection.Descending));
+            collectionView.SortDescriptions.Add(new SortDescription(nameof(Memo.Options), ListSortDirection.Descending));
             collectionView.SortDescriptions.Add(new SortDescription(SortBy switch
             {
                 SortBy.Created => nameof(Memo.InsertedDate),
                 SortBy.Updated => nameof(Memo.UpdatedDate),
-                SortBy.Header => nameof(Memo.Header)
+                SortBy.Header => nameof(Memo.Header),
+                _ => nameof(Memo.InsertedDate)
             }, SortDirection));
 
             if (refreshView)

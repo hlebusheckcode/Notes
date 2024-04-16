@@ -43,14 +43,15 @@ namespace Notes
 
             if (openFileDialog.ShowDialog() == true)
             {
-                var content = await File.ReadAllTextAsync(openFileDialog.FileName);
-                if (string.IsNullOrEmpty(content))
+                using var stream = File.OpenRead(openFileDialog.FileName);
+                if (stream == null)
                     return;
-                var newItems = JsonSerializer.Deserialize<Memo[]>(content);
+                Memo[]? newItems = await JsonSerializer.DeserializeAsync<Memo[]>(stream);
+                stream.Close();
                 if (newItems?.Any() != true)
                     return;
                 await _repository.Import(newItems);
-                if(Owner is MainWindow mainWindow)
+                if (Owner is MainWindow mainWindow)
                     mainWindow.Refresh();
                 CustomMessageBox.Show(
                     this,
@@ -92,11 +93,6 @@ namespace Notes
             minButton.Visibility = Visibility.Collapsed;
             maxButton.Visibility = Visibility.Collapsed;
             ResizeMode = ResizeMode.NoResize;
-        }
-
-        private void ClosedWindow(object sender, EventArgs e)
-        {
-            App.ConfigurationOpen = false;
         }
     }
 }

@@ -1,17 +1,20 @@
-﻿using Baza.Repository;
-using Notes.Model;
+﻿using Notes.Model;
 
 namespace Notes.Repository
 {
-    public interface IMemoRepository : IRepository<Memo>
+    public interface IMemoRepository
     {
-        public Task<Memo> Update(int id, Memo item, bool changeUpdatedDate);
-        public Task<Memo> Update(Memo item, bool changeUpdatedDate);
+        public Task<IEnumerable<Memo>> Get();
+        public Task<Memo> Get(uint id);
+
+        public Task<Memo> Insert(Memo item);
+
+        public Task<Memo> Update(Memo item);
 
         public Task<Memo> Remove(Memo item);
-        public Task<Memo> Remove(int id);
         public Task<Memo> Recover(Memo item);
-        public Task<Memo> Recover(int id);
+
+        public Task<Memo> Delete(Memo item);
 
         public Task Import(IEnumerable<Memo> items);
     }

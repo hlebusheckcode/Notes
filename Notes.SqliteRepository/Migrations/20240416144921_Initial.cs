@@ -15,15 +15,15 @@ namespace Notes.SqliteRepository.Migrations
                 name: "Memos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<uint>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Header = table.Column<string>(type: "TEXT", nullable: false),
                     Body = table.Column<string>(type: "TEXT", nullable: false),
-                    Favorite = table.Column<bool>(type: "INTEGER", nullable: false),
-                    BodyPropertiesWrapping = table.Column<bool>(name: "BodyProperties_Wrapping", type: "INTEGER", nullable: false),
-                    BodyPropertiesReadOnly = table.Column<bool>(name: "BodyProperties_ReadOnly", type: "INTEGER", nullable: false),
+                    Options_Favorite = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Options_Wrapping = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Options_ReadOnly = table.Column<bool>(type: "INTEGER", nullable: false),
                     InsertedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     RemovedDate = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>

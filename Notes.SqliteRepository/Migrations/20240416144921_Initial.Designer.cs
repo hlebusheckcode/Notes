@@ -11,27 +11,24 @@ using Notes.SqliteRepository;
 namespace Notes.SqliteRepository.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221127144058_Initial")]
+    [Migration("20240416144921_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
 
             modelBuilder.Entity("Notes.Model.Memo", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("Favorite")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Header")
                         .IsRequired()
@@ -43,7 +40,7 @@ namespace Notes.SqliteRepository.Migrations
                     b.Property<DateTime?>("RemovedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -53,9 +50,12 @@ namespace Notes.SqliteRepository.Migrations
 
             modelBuilder.Entity("Notes.Model.Memo", b =>
                 {
-                    b.OwnsOne("Notes.Model.TextProperties", "BodyProperties", b1 =>
+                    b.OwnsOne("Notes.Model.MemoOptions", "Options", b1 =>
                         {
-                            b1.Property<int>("MemoId")
+                            b1.Property<uint>("MemoId")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<bool>("Favorite")
                                 .HasColumnType("INTEGER");
 
                             b1.Property<bool>("ReadOnly")
@@ -72,7 +72,7 @@ namespace Notes.SqliteRepository.Migrations
                                 .HasForeignKey("MemoId");
                         });
 
-                    b.Navigation("BodyProperties")
+                    b.Navigation("Options")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

@@ -12,16 +12,20 @@ namespace Notes.Controls.Commands
             _action = action;
         }
 
-        public void Execute(object parameter)
+        public void Execute(object? parameter)
         {
             _action();
         }
 
-        public bool CanExecute(object parameter)
+        public bool CanExecute(object? parameter)
         {
             return true;
         }
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler? CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
     }
 }

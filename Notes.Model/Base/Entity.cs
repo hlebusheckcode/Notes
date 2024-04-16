@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
-namespace Baza.Model
+namespace Notes.Model.Base
 {
     public abstract class Entity : IEntity
     {
@@ -30,10 +30,16 @@ namespace Baza.Model
                 return false;
             }
         }
+
         [NotMapped, JsonIgnore]
         public bool TrackChanges { get; set; } = true;
+
         [NotMapped, JsonIgnore]
-        public bool HasChanges => _oldProperties?.Any() == true;
+        public IEnumerable<string> ChangedProperties =>
+            _oldProperties?.Keys ?? Enumerable.Empty<string>();
+
+        [NotMapped, JsonIgnore]
+        public bool HasChanges => _oldProperties?.Count > 0;
 
         #endregion Public properties
 
